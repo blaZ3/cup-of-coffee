@@ -1,4 +1,4 @@
-package com.example.simplereddit.app.home
+package com.example.cupofcoffee.app.views.home
 
 import android.content.Context
 import android.util.AttributeSet

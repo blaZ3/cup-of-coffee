@@ -1,8 +1,8 @@
-package com.example.simplereddit
+package com.example.cupofcoffee
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.simplereddit.app.home.HomeView
+import com.example.cupofcoffee.app.views.home.HomeView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

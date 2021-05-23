@@ -1,4 +1,4 @@
-package com.example.simplereddit
+package com.example.cupofcoffee
 
 import org.junit.Test
 

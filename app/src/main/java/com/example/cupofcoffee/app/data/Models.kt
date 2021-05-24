@@ -5,13 +5,27 @@ import se.ansman.kotshi.JsonSerializable
 
 
 @JsonSerializable
-data class Post(
+data class PostResult(
     val kind: String,
-    val data: PostData
+    val data: PostResultData
 )
 
 @JsonSerializable
-data class PostData(
+data class PostResultData(
+    val modhash: String,
+    val after: String,
+    val children: List<PostInfo>
+)
+
+@JsonSerializable
+data class PostInfo(
+    val kind: String,
+    @Json(name = "data")
+    val post: Post
+)
+
+@JsonSerializable
+data class Post(
     val title: String,
     val subreddit: String,
     @Json(name = "author_fullname")

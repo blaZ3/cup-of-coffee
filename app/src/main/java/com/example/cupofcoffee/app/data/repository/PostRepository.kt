@@ -12,14 +12,16 @@ class PostRepository @Inject constructor(
 ) {
     suspend fun getPosts(subReddit: String): List<Post>? {
         return when (val result = redditService.getPosts(subReddit)) {
-            is Result.Success -> result.data
+            is Result.Success -> {
+                result.body.data.children.map { it.post }
+            }
             is Result.NetworkError -> {
-                log.e("NetworkError while getting posts")
+                log.e("NetworkError while getting posts ${result.code} ${result.t}")
                 result.t?.printStackTrace()
                 null
             }
             is Result.NetworkFailure -> {
-                log.e("NetworkFailure while getting posts")
+                log.e("NetworkFailure while getting posts ${result.t}")
                 null
             }
         }

@@ -1,7 +1,7 @@
 package com.example.cupofcoffee.app.data.network
 
 import com.example.cupofcoffee.app.data.PostResult
-import com.example.cupofcoffee.helpers.network.BaseService
+import com.example.cupofcoffee.base.BaseService
 import com.example.cupofcoffee.helpers.network.Result
 import retrofit2.Response
 import retrofit2.http.GET

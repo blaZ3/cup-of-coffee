@@ -1,5 +1,6 @@
-package com.example.cupofcoffee.helpers.network
+package com.example.cupofcoffee.base
 
+import com.example.cupofcoffee.helpers.network.Result
 import com.example.cupofcoffee.helpers.network.Result.*
 import retrofit2.Response
 

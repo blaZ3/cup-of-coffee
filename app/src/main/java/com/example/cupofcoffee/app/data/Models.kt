@@ -26,25 +26,25 @@ data class PostInfo(
 
 @JsonSerializable
 data class Post(
-    val title: String,
-    val subreddit: String,
+    val title: String? = null,
+    val subreddit: String? = null,
     @Json(name = "author_fullname")
-    val authorFullName: String,
-    val author: String,
+    val authorFullName: String? = null,
+    val author: String? = null,
     @Json(name = "is_original_content")
-    val isOriginalContent: Boolean,
+    val isOriginalContent: Boolean = false,
     @Json(name = "over_18")
-    val over18: Boolean,
-    val spoiler: Boolean,
-    val created: Long,
+    val over18: Boolean = false,
+    val spoiler: Boolean = false,
+    val created: Long = -1,
     val preview: Preview? = null,
     @Json(name = "upvote_ratio")
-    val upvoteRatio: Float,
-    val ups: Long,
+    val upvoteRatio: Float = -1f,
+    val ups: Long = -1,
     @Json(name = "total_awards_received")
-    val totalAwardsReceived: Int,
+    val totalAwardsReceived: Int = -1,
     @Json(name = "is_video")
-    val isVideo: Boolean,
+    val isVideo: Boolean = false,
 ) {
     val isText: Boolean get() = !isVideo && preview == null
     val isImage: Boolean get() = !isVideo && preview != null

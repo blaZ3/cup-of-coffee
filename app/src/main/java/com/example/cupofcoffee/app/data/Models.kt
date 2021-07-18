@@ -5,23 +5,28 @@ import se.ansman.kotshi.JsonSerializable
 
 
 @JsonSerializable
+enum class ResultKind {
+    Listing
+}
+
+@JsonSerializable
 data class PostResult(
-    val kind: String,
-    val data: PostResultData
+    val kind: ResultKind? = null,
+    val data: PostResultData? = null
 )
 
 @JsonSerializable
 data class PostResultData(
-    val modhash: String,
-    val after: String,
-    val children: List<PostInfo>
+    val modhash: String? = null,
+    val after: String? = null,
+    val children: List<PostInfo>? = null
 )
 
 @JsonSerializable
 data class PostInfo(
-    val kind: String,
+    val kind: String? = null,
     @Json(name = "data")
-    val post: Post
+    val post: Post? = null
 )
 
 @JsonSerializable
@@ -52,18 +57,25 @@ data class Post(
 
 @JsonSerializable
 data class Preview(
-    val images: List<PreviewImage>
+    val images: List<PreviewImage>? = null
 )
 
 @JsonSerializable
 data class PreviewImage(
-    val source: ImageSource,
-    val resolutions: List<ImageSource>
+    val source: ImageSource? = null,
+    val resolutions: List<ImageSource>? = null
 )
 
 @JsonSerializable
 data class ImageSource(
-    val url: String,
-    val width: Int,
-    val height: Int
-)
+    val url: String? = null,
+    val width: Int? = null,
+    val height: Int? = null
+) {
+    fun getCleanedUrl(): String? {
+        return url?.let {
+            if (it.contains("&amp;")) return it.replace("&amp;", "&")
+            else it
+        }
+    }
+}

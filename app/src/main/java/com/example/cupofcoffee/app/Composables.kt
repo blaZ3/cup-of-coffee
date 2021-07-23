@@ -132,10 +132,9 @@ fun Post(post: Post, log: Log? = null) {
                     overflow = Ellipsis
                 )
             }
-            val cleanedUrl = post.preview?.images?.first()?.source?.getCleanedUrl()
-            if (post.isImage && cleanedUrl != null) {
+            if (post.isImage && post.cleanedImageUrl != null) {
                 Image(
-                    painter = rememberCoilPainter(request = cleanedUrl),
+                    painter = rememberCoilPainter(request = post.cleanedImageUrl),
                     contentDescription = post.title,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -148,6 +147,12 @@ fun Post(post: Post, log: Log? = null) {
             Row(modifier = Modifier.padding(top = 4.dp)) {
                 Text(
                     text = post.created.toString(),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = post.name.toString(),
                     fontSize = 12.sp,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )

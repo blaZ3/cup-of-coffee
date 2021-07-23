@@ -32,31 +32,64 @@ internal class HomeModel @Inject constructor(
     private fun doAction(it: HomeAction) {
         log.d("doAction: $it")
         when (it) {
-            InitAction -> loadPosts()
-            is Reload -> loadPosts()
+            InitAction -> {
+                scope.launch {
+                    currState = currState.copy(
+                        isLoading = true,
+                        showLoadingError = false,
+                        showEmptyPosts = false,
+                        isPaginating = false
+                    )
+                    internalViewState.emit(currState)
+                    loadPosts()
+                }
+            }
+            is Reload -> {
+                scope.launch {
+                    currState = currState.copy(
+                        isLoading = true,
+                        showLoadingError = false,
+                        showEmptyPosts = false,
+                        isPaginating = false
+                    )
+                    internalViewState.emit(currState)
+                    loadPosts()
+                }
+            }
             is LoadMore -> {
                 scope.launch {
                     currState = currState.copy(isPaginating = true)
                     internalViewState.emit(currState)
                 }
+                loadPosts()
             }
         }
     }
 
     private fun loadPosts() {
         scope.launch {
-            currState = currState.copy(
-                isLoading = true,
-                showLoadingError = false,
-                showEmptyPosts = false
+            val result = postRepo.getPosts(
+                currState.subreddit,
+                currState.after
             )
-            internalViewState.emit(currState)
-            val posts = postRepo.getPosts(currState.subreddit)
-            currState = currState.copy(isLoading = false)
-            currState = if (posts != null) {
+            val resultPosts = result?.second
+            currState = currState.copy(
+                isLoading = false,
+                isPaginating = false
+            )
+            currState = if (resultPosts != null) {
+                val newPosts = currState.posts.toMutableList()
+                newPosts.addAll(resultPosts.map {
+                    if (it.isImage) {
+                        it.copy(
+                            cleanedImageUrl = it.preview?.images?.first()?.source?.getCleanedUrl()
+                        )
+                    } else it
+                })
                 currState.copy(
-                    posts = posts,
-                    showEmptyPosts = posts.isEmpty()
+                    posts = newPosts,
+                    after = result.first,
+                    showEmptyPosts = resultPosts.isEmpty()
                 )
             } else {
                 currState.copy(
@@ -75,7 +108,8 @@ data class HomeViewState(
     val showEmptyPosts: Boolean = false,
     val showLoadingError: Boolean = false,
     val isPaginating: Boolean = false,
-    val posts: List<Post>? = null
+    val posts: List<Post> = arrayListOf(),
+    val after: String? = null,
 )
 
 sealed class HomeAction {

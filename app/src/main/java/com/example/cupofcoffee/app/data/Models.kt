@@ -32,6 +32,7 @@ data class PostInfo(
 @JsonSerializable
 data class Post(
     val title: String? = null,
+    val name: String? = null,
     val subreddit: String? = null,
     @Json(name = "author_fullname")
     val authorFullName: String? = null,
@@ -50,6 +51,8 @@ data class Post(
     val totalAwardsReceived: Int = -1,
     @Json(name = "is_video")
     val isVideo: Boolean = false,
+
+    val cleanedImageUrl: String? = null
 ) {
     val isText: Boolean get() = !isVideo && preview == null
     val isImage: Boolean get() = !isVideo && preview != null

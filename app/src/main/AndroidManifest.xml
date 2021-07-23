@@ -13,16 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CupOfCoffee">
         <activity
-            android:name=".MainActivity2"
+            android:name=".app.views.detail.PostDetailActivity"
             android:exported="true"
-            android:label="@string/title_activity_main2"
+            android:label="@string/title_activity_post_detail"
             android:theme="@style/Theme.CupOfCoffee.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

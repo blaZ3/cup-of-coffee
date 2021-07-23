@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
@@ -30,6 +28,7 @@ import com.example.cupofcoffee.app.views.home.HomeAction.LoadMore
 import com.example.cupofcoffee.app.views.home.HomeAction.Reload
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
+import com.example.cupofcoffee.helpers.navigation.Navigator
 import com.example.cupofcoffee.ui.theme.CupOfCoffeeTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -38,10 +37,12 @@ import dagger.hilt.android.components.ActivityComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.*
 
 
-class HomeView(context: Context) : AbstractComposeView(context) {
+class HomeView(
+    context: Context,
+    private val navigator: Navigator
+) : AbstractComposeView(context) {
 
     private lateinit var model: HomeModel
     private lateinit var log: Log
@@ -70,6 +71,9 @@ class HomeView(context: Context) : AbstractComposeView(context) {
             onPageEndReached = {
                 log.d("onPageEndReached")
                 scope.launch { model.actions.emit(LoadMore()) }
+            },
+            onPostClicked = {
+                navigator.navigateToPostDetail(it)
             }
         )
     }
@@ -86,7 +90,8 @@ class HomeView(context: Context) : AbstractComposeView(context) {
 private fun HomeScreen(
     viewState: StateFlow<HomeViewState>, log: Log? = null,
     onReloadPosts: () -> Unit,
-    onPageEndReached: () -> Unit
+    onPageEndReached: () -> Unit,
+    onPostClicked: (post: Post) -> Unit
 ) {
     viewState.collectAsState().value.let { state ->
         log?.d("HomeView new state: $state")
@@ -103,12 +108,12 @@ private fun HomeScreen(
                 if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
 
                 if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
-                    state.posts?.let {
+                    state.posts.let {
                         val listState = rememberLazyListState()
                         val lastIndex = remember { mutableStateOf(0) }
                         Box {
                             LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
-                                items(it) { post -> Post(post, log) }
+                                items(it) { post -> Post(post, log, onPostClicked) }
                             }
                             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
                                 if (it.index != lastIndex.value) {
@@ -188,6 +193,7 @@ private fun HomeComposePreview() {
     HomeScreen(
         viewState = state,
         onReloadPosts = {},
-        onPageEndReached = {}
+        onPageEndReached = {},
+        onPostClicked = {}
     )
 }

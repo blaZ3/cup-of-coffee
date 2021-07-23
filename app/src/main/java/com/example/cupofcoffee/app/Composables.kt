@@ -1,6 +1,7 @@
 package com.example.cupofcoffee.app
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -94,11 +95,14 @@ fun NetworkError(onReload: () -> Unit) {
 }
 
 @Composable
-fun Post(post: Post, log: Log? = null) {
+fun Post(post: Post,  log: Log? = null, onPostClicked: (post: Post) -> Unit) {
     Card(
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth()
+            .clickable {
+                onPostClicked(post)
+            }
     ) {
         Column(modifier = Modifier.padding(4.dp)) {
             Row {

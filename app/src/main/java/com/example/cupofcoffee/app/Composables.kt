@@ -1,7 +1,6 @@
 package com.example.cupofcoffee.app
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,12 +13,13 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale.Companion.Fit
+import androidx.compose.ui.layout.ContentScale.Companion.Inside
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cupofcoffee.Error
-import com.example.cupofcoffee.app.data.Post
-import com.example.cupofcoffee.helpers.log.Log
+import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.ui.theme.Purple700
 import com.google.accompanist.coil.rememberCoilPainter
 
@@ -95,16 +95,15 @@ fun NetworkError(onReload: () -> Unit) {
 }
 
 @Composable
-fun Post(post: Post,  log: Log? = null, onPostClicked: (post: Post) -> Unit) {
+fun Post(post: Post, onPostClicked: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth()
-            .clickable {
-                onPostClicked(post)
-            }
     ) {
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(
+            modifier = Modifier.padding(4.dp)
+        ) {
             Row {
                 post.subreddit?.let {
                     Text(
@@ -138,12 +137,14 @@ fun Post(post: Post,  log: Log? = null, onPostClicked: (post: Post) -> Unit) {
             }
             if (post.isImage && post.cleanedImageUrl != null) {
                 Image(
-                    painter = rememberCoilPainter(request = post.cleanedImageUrl),
+                    painter = rememberCoilPainter(
+                        request = post.preview?.images?.first()?.high?.getCleanedUrl()
+                    ),
                     contentDescription = post.title,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp)
-                        .height(200.dp)
+                        .height(250.dp)
                         .clip(shape = RoundedCornerShape(4.dp)),
                     contentScale = Crop
                 )

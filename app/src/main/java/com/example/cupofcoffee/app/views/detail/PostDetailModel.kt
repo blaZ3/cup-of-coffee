@@ -1,5 +1,6 @@
 package com.example.cupofcoffee.app.views.detail
 
+import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.InitAction
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 internal class PostDetailModel @Inject constructor(
-    private val log: Log
+    private val log: Log,
+    private val postRepo: PostRepository
 ) {
 
     private lateinit var scope: ManagedCoroutineScope
@@ -29,8 +31,13 @@ internal class PostDetailModel @Inject constructor(
 
     private fun doAction(it: PostDetailAction) {
         when (it) {
-            InitAction -> TODO()
+            InitAction -> loadComments()
         }
+    }
+
+
+    private fun loadComments(){
+
     }
 
 }

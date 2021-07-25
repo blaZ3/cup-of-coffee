@@ -44,6 +44,9 @@ android {
         kotlinCompilerExtensionVersion '1.0.0-beta07'
         kotlinCompilerVersion '1.4.32'
     }
+    sourceSets {
+        test.resources.srcDirs += 'src/test/res'
+    }
 }
 
 dependencies {
@@ -59,6 +62,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:2.36"
 
     implementation "com.squareup.moshi:moshi:1.12.0"
+    implementation "com.squareup.moshi:moshi-adapters:1.8.0"
     implementation "se.ansman.kotshi:api:2.4.0"
     kapt "se.ansman.kotshi:compiler:2.4.0"
 

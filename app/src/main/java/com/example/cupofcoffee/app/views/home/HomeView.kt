@@ -1,5 +1,6 @@
 package com.example.cupofcoffee.app.views.home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -21,9 +22,9 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.cupofcoffee.Error.NetworkError
 import com.example.cupofcoffee.app.*
-import com.example.cupofcoffee.app.data.ImageSource
-import com.example.cupofcoffee.app.data.Post
-import com.example.cupofcoffee.app.data.PreviewImage
+import com.example.cupofcoffee.app.data.models.ImageSource
+import com.example.cupofcoffee.app.data.models.Post
+import com.example.cupofcoffee.app.data.models.PreviewImage
 import com.example.cupofcoffee.app.views.home.HomeAction.LoadMore
 import com.example.cupofcoffee.app.views.home.HomeAction.Reload
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("ViewConstructor")
 class HomeView(
     context: Context,
     private val navigator: Navigator
@@ -55,7 +57,7 @@ class HomeView(
             HomeViewEntryPoint::class.java
         )
         log = entryPoint.log()
-        model = entryPoint.model()
+        model = entryPoint.homeDetail()
         findViewTreeLifecycleOwner()?.lifecycleScope?.let {
             scope = it
             model.init(LifecycleManagedCoroutineScope(scope))
@@ -73,7 +75,7 @@ class HomeView(
                 scope.launch { model.actions.emit(LoadMore()) }
             },
             onPostClicked = {
-                navigator.navigateToPostDetail(it)
+//                navigator.navigateToPostDetail(it)
             }
         )
     }
@@ -81,7 +83,7 @@ class HomeView(
     @EntryPoint
     @InstallIn(ActivityComponent::class)
     internal interface HomeViewEntryPoint {
-        fun model(): HomeModel
+        fun homeDetail(): HomeModel
         fun log(): Log
     }
 }
@@ -91,7 +93,7 @@ private fun HomeScreen(
     viewState: StateFlow<HomeViewState>, log: Log? = null,
     onReloadPosts: () -> Unit,
     onPageEndReached: () -> Unit,
-    onPostClicked: (post: Post) -> Unit
+    onPostClicked: () -> Unit
 ) {
     viewState.collectAsState().value.let { state ->
         log?.d("HomeView new state: $state")
@@ -113,7 +115,7 @@ private fun HomeScreen(
                         val lastIndex = remember { mutableStateOf(0) }
                         Box {
                             LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
-                                items(it) { post -> Post(post, log, onPostClicked) }
+                                items(it) { post -> Post(post, onPostClicked) }
                             }
                             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
                                 if (it.index != lastIndex.value) {
@@ -158,7 +160,7 @@ private fun HomeComposePreview() {
                     title = "Title 2",
                     isVideo = false,
                     isOriginalContent = true,
-                    preview = com.example.cupofcoffee.app.data.Preview(
+                    preview = com.example.cupofcoffee.app.data.models.Preview(
                         images = listOf(
                             PreviewImage(
                                 source = ImageSource(url = "")
@@ -170,7 +172,7 @@ private fun HomeComposePreview() {
                     title = "Title 2",
                     isVideo = false,
                     isOriginalContent = true,
-                    preview = com.example.cupofcoffee.app.data.Preview(
+                    preview = com.example.cupofcoffee.app.data.models.Preview(
                         images = listOf(
                             PreviewImage(
                                 source = ImageSource(url = "")

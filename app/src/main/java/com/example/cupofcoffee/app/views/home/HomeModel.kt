@@ -1,6 +1,6 @@
 package com.example.cupofcoffee.app.views.home
 
-import com.example.cupofcoffee.app.data.Post
+import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.views.home.HomeAction.*
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
@@ -72,7 +72,7 @@ internal class HomeModel @Inject constructor(
                 currState.subreddit,
                 currState.after
             )
-            val resultPosts = result?.second
+            val resultPosts = result?.posts
             currState = currState.copy(
                 isLoading = false,
                 isPaginating = false
@@ -88,7 +88,7 @@ internal class HomeModel @Inject constructor(
                 })
                 currState.copy(
                     posts = newPosts,
-                    after = result.first,
+                    after = result.after,
                     showEmptyPosts = resultPosts.isEmpty()
                 )
             } else {

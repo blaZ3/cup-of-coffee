@@ -1,7 +1,7 @@
 package com.example.cupofcoffee.app.views.home
 
-import com.example.cupofcoffee.app.data.*
-import com.example.cupofcoffee.app.data.ResultKind.Listing
+import com.example.cupofcoffee.app.data.models.*
+import com.example.cupofcoffee.app.data.models.ResultType.Listing
 import com.example.cupofcoffee.app.data.network.RedditApi
 import com.example.cupofcoffee.app.data.network.RedditService
 import com.example.cupofcoffee.app.data.repository.PostRepository
@@ -17,6 +17,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Response.error
@@ -33,14 +34,13 @@ class HomeModelTests {
 
     private val scope = TestManagedCoroutineScope(TestCoroutineScope())
 
-    private val result = PostResult(
-        kind = Listing,
-        data = PostResultData(
+    private val result = ApiResult(
+        resultType = Listing,
+        data = Data(
             modhash = "modhash",
             children = listOf(
-                PostInfo(
-                    kind = "t3",
-                    post = Post(
+                DataChild.PostData(
+                    data = Post(
                         title = "Test post"
                     )
                 )
@@ -50,7 +50,7 @@ class HomeModelTests {
 
     @Test
     fun `test home model emits correct view state for success`() = runBlockingTest {
-        whenever(api.getPosts(any())).thenReturn(success(result))
+        whenever(api.getPosts(any(), anyOrNull())).thenReturn(success(result))
         val viewStates = mutableListOf<HomeViewState>()
         val job = launch { model.viewState.toList(viewStates) }
 
@@ -68,7 +68,7 @@ class HomeModelTests {
 
     @Test
     fun `test home model emits view state with loading error`() = runBlockingTest {
-        whenever(api.getPosts(any())).thenReturn(
+        whenever(api.getPosts(any(), anyOrNull())).thenReturn(
             error(400, "{}".toResponseBody("application/json".toMediaType()))
         )
         val viewStates = mutableListOf<HomeViewState>()

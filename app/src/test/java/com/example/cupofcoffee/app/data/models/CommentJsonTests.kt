@@ -4,6 +4,7 @@ import com.example.cupofcoffee.ApplicationJsonAdapterFactory
 import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.data.models.ResultType.Listing
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.junit.Test
@@ -30,10 +31,10 @@ class CommentJsonTests {
 
         val commentResult = adapter.fromJson(json)
 
-        Truth.assertThat(commentResult?.first()?.resultType).isEqualTo(Listing)
-        Truth.assertThat(commentResult?.first()?.data?.children?.first())
+        assertThat(commentResult?.first()?.resultType).isEqualTo(Listing)
+        assertThat(commentResult?.first()?.data?.children?.first())
             .isInstanceOf(DataChild.PostData::class.java)
-        Truth.assertThat(commentResult?.get(1)?.data?.children?.first())
+        assertThat(commentResult?.get(1)?.data?.children?.first())
             .isInstanceOf(CommentData::class.java)
     }
 

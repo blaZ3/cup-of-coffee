@@ -1,13 +1,9 @@
 package com.example.cupofcoffee
 
-import com.example.cupofcoffee.app.data.models.DataChild
-import com.example.cupofcoffee.app.data.models.ObjectKind.Comment
-import com.example.cupofcoffee.app.data.models.ObjectKind.Link
 import com.example.cupofcoffee.app.data.network.RedditApi
 import com.example.cupofcoffee.helpers.log.AndroidLog
 import com.example.cupofcoffee.helpers.log.Log
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,6 +1,7 @@
 package com.example.cupofcoffee.app.data.models
 
 import com.example.cupofcoffee.ApplicationJsonAdapterFactory
+import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.data.models.ResultType.Listing
 import com.google.common.truth.Truth
 import com.squareup.moshi.Moshi
@@ -16,8 +17,12 @@ class CommentJsonTests {
         .add(ApplicationJsonAdapterFactory)
         .build()
 
+    /*
+    This test is only to help development while adding JSON parsing not to verify that
+    Moshi works, feel free to delete later
+    */
     @Test
-    fun test() {
+    fun testCommentJsonParsingWorks() {
         val json = readJson("comments.json")
 
         val type = Types.newParameterizedType(List::class.java, ApiResult::class.java)
@@ -26,7 +31,10 @@ class CommentJsonTests {
         val commentResult = adapter.fromJson(json)
 
         Truth.assertThat(commentResult?.first()?.resultType).isEqualTo(Listing)
-
+        Truth.assertThat(commentResult?.first()?.data?.children?.first())
+            .isInstanceOf(DataChild.PostData::class.java)
+        Truth.assertThat(commentResult?.get(1)?.data?.children?.first())
+            .isInstanceOf(CommentData::class.java)
     }
 
     private fun readJson(fileName: String): String {

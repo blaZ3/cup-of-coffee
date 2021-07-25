@@ -1,6 +1,6 @@
 package com.example.cupofcoffee.app.data.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.*
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -39,5 +39,5 @@ data class Comment(
     val totalAwardsReceived: Int?,
     @Json(name = "link_id")
     val linkId: String?,
-    val body: String
+    val body: String?
 )

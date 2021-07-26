@@ -1,6 +1,7 @@
 package com.example.cupofcoffee
 
 import com.example.cupofcoffee.app.data.network.RedditApi
+import com.example.cupofcoffee.helpers.json.ApiResultEmptyStringToNullAdapter
 import com.example.cupofcoffee.helpers.log.AndroidLog
 import com.example.cupofcoffee.helpers.log.Log
 import com.squareup.moshi.Moshi
@@ -21,6 +22,7 @@ object HelperModule {
     @Provides
     fun provideMoshi(): Moshi {
         return Moshi.Builder()
+            .add(ApiResultEmptyStringToNullAdapter)
             .add(ApplicationJsonAdapterFactory)
             .build()
     }

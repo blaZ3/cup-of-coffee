@@ -3,7 +3,7 @@ package com.example.cupofcoffee.app.data.models
 import com.example.cupofcoffee.ApplicationJsonAdapterFactory
 import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.data.models.ResultType.Listing
-import com.google.common.truth.Truth
+import com.example.cupofcoffee.helpers.json.ApiResultEmptyStringToNullAdapter
 import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets
 class CommentJsonTests {
 
     private val moshi = Moshi.Builder()
+        .add(ApiResultEmptyStringToNullAdapter)
         .add(ApplicationJsonAdapterFactory)
         .build()
 
@@ -36,6 +37,9 @@ class CommentJsonTests {
             .isInstanceOf(DataChild.PostData::class.java)
         assertThat(commentResult?.get(1)?.data?.children?.first())
             .isInstanceOf(CommentData::class.java)
+
+        assertThat((commentResult?.get(1)?.data?.children?.first() as CommentData).data?.replies)
+            .isInstanceOf(ApiResult::class.java)
     }
 
     private fun readJson(fileName: String): String {

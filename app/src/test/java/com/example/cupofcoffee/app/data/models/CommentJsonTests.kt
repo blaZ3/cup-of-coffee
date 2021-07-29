@@ -38,7 +38,7 @@ class CommentJsonTests {
         assertThat(commentResult?.get(1)?.data?.children?.first())
             .isInstanceOf(CommentData::class.java)
 
-        assertThat((commentResult?.get(1)?.data?.children?.first() as CommentData).data?.replies)
+        assertThat((commentResult?.get(1)?.data?.children?.first() as CommentData).data?.repliesResult)
             .isInstanceOf(ApiResult::class.java)
     }
 

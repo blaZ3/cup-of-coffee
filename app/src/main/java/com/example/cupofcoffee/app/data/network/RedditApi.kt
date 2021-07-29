@@ -10,15 +10,26 @@ import retrofit2.http.Query
 import javax.inject.Inject
 
 interface RedditApi {
-    @GET("/r/{subreddit}.json")
+    @GET("/r/{subReddit}.json")
     suspend fun getPosts(
-        @Path("subreddit") subreddit: String,
+        @Path("subReddit") subReddit: String,
         @Query("after") after: String?,
     ): Response<ApiResult>
+
+    @GET("/r/{subReddit}/comments/{postShortName}.json")
+    suspend fun getPostDetail(
+        @Path("subReddit") subReddit: String,
+        @Path("postShortName") postShortName: String,
+        @Query("limit") limit: Int = 0
+    ): Response<List<ApiResult>>
 }
 
 class RedditService @Inject constructor(private val api: RedditApi) : BaseService() {
     suspend fun getPosts(subreddit: String, after: String?): Result<ApiResult> {
         return apiCall { api.getPosts(subreddit, after = after) }
+    }
+
+    suspend fun getPostDetail(subreddit: String, postShortName: String): Result<List<ApiResult>> {
+        return apiCall { api.getPostDetail(subreddit, postShortName) }
     }
 }

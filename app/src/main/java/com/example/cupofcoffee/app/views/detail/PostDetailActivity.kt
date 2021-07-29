@@ -3,10 +3,7 @@ package com.example.cupofcoffee.app.views.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
@@ -14,28 +11,33 @@ import com.example.cupofcoffee.app.views.home.ui.theme.CupOfCoffeeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class PostDetailActivity : ComponentActivity() {
+class PostDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            CupOfCoffeeTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    Greeting("Android")
-                }
-            }
+
+        var data = intent.extras
+        if (savedInstanceState != null) {
+            data = savedInstanceState
         }
+
+        val subReddit: String = data?.getString(EXTRA_SUBREDDIT)
+            ?: throw IllegalStateException("Subreddit cannot be null")
+
+        val postShortName: String = data.getString(EXTRA_POST_SHORT_NAME)
+            ?: throw IllegalStateException("Subreddit cannot be null")
+
+        setContentView(PostDetailView(this, subReddit, postShortName))
     }
 
 
     companion object {
         private const val EXTRA_SUBREDDIT = "extra_subreddit"
-        private const val EXTRA_POST_NAME = "extra_post_name"
-        fun getIntent(context: Context, subreddit: String?, name: String?): Intent {
+        private const val EXTRA_POST_SHORT_NAME = "extra_post_short_name"
+        fun getIntent(context: Context, subreddit: String?, postShortName: String?): Intent {
             return Intent(context, PostDetailActivity::class.java).apply {
                 putExtra(EXTRA_SUBREDDIT, subreddit)
-                putExtra(EXTRA_POST_NAME, name)
+                putExtra(EXTRA_POST_SHORT_NAME, postShortName)
             }
         }
     }

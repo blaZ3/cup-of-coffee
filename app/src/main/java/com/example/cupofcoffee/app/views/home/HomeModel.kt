@@ -79,13 +79,7 @@ internal class HomeModel @Inject constructor(
             )
             currState = if (resultPosts != null) {
                 val newPosts = currState.posts.toMutableList()
-                newPosts.addAll(resultPosts.map {
-                    if (it.isImage) {
-                        it.copy(
-                            cleanedImageUrl = it.preview?.images?.first()?.source?.getCleanedUrl()
-                        )
-                    } else it
-                })
+                newPosts.addAll(resultPosts)
                 currState.copy(
                     posts = newPosts,
                     after = result.after,

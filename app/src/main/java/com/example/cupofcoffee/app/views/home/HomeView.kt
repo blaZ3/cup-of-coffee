@@ -75,7 +75,7 @@ class HomeView(
                 scope.launch { model.actions.emit(LoadMore()) }
             },
             onPostClicked = {
-//                navigator.navigateToPostDetail(it)
+                navigator.navigateToPostDetail(it)
             }
         )
     }
@@ -93,7 +93,7 @@ private fun HomeScreen(
     viewState: StateFlow<HomeViewState>, log: Log? = null,
     onReloadPosts: () -> Unit,
     onPageEndReached: () -> Unit,
-    onPostClicked: () -> Unit
+    onPostClicked: (post: Post) -> Unit
 ) {
     viewState.collectAsState().value.let { state ->
         log?.d("HomeView new state: $state")

@@ -1,15 +1,13 @@
 package com.example.cupofcoffee.app.data.models
 
-import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonReader
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class Post(
     val title: String? = null,
-    val name: String? = null,
+    @Json(name = "name")
+    val postFullName: String? = null,
     val subreddit: String? = null,
     @Json(name = "author_fullname")
     val authorFullName: String? = null,
@@ -29,19 +27,53 @@ data class Post(
     @Json(name = "is_video")
     val isVideo: Boolean = false,
 
-    val cleanedImageUrl: String? = null
-) {
+
+    ) {
     val isText: Boolean get() = !isVideo && preview == null
     val isImage: Boolean get() = !isVideo && preview != null
-    val postName: String? get() = name?.substring(0, name.indexOfFirst { it == '_' })
+    val createdAtStr = created.toString()
+    val cleanedImageUrl: String? = preview?.images?.first()?.source?.getCleanedUrl()
 }
+
 
 @JsonSerializable
 data class Comment(
     @Json(name = "total_awards_received")
-    val totalAwardsReceived: Int?,
+    val totalAwardsReceived: Int? = null,
+    val body: String? = null,
+    @Json(name = "body_html")
+    val bodyHtml: String? = null,
     @Json(name = "link_id")
-    val linkId: String?,
-    val body: String?,
-    val replies: ApiResult?
-)
+    val linkId: String? = null,
+    @Json(name = "replies")
+    val repliesResult: ApiResult? = null,
+    @Json(name = "parent_id")
+    val parentId: String? = null,
+    @Json(name = "author_fullname")
+    val authorFullName: String? = null,
+    val author: String? = null,
+    val downs: Int = 0,
+    val ups: Int = 0,
+    val score: Int = 0,
+    @Json(name = "subreddit_id")
+    val subredditId: String? = null,
+    val permalink: String? = null,
+    val name: String? = null,
+    val created: Long = 0,
+    @Json(name = "created_utc")
+    val createdUTC: Long = 0,
+    val subreddit: String? = null,
+) {
+    val replies: List<Comment>?
+        get() = repliesResult?.data?.children?.mapNotNull {
+            (it as DataChild.CommentData).data
+        }
+}
+
+
+fun String.asShortName(): String {
+    return this.substring(
+        indexOfFirst { it == '_' } + 1,
+        length
+    )
+}

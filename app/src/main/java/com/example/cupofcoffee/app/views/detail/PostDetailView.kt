@@ -17,8 +17,8 @@ import com.example.cupofcoffee.Error.NetworkError
 import com.example.cupofcoffee.app.Loading
 import com.example.cupofcoffee.app.LoadingError
 import com.example.cupofcoffee.app.PostDetail
-import com.example.cupofcoffee.app.data.models.Comment
-import com.example.cupofcoffee.app.data.models.Post
+import com.example.cupofcoffee.app.data.models.*
+import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.LoadPostAndComments
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
@@ -123,7 +123,19 @@ fun PostDetailScreenPreview() {
                 comment.copy(
                     body = "Comment $it",
                     authorFullName = "Author name $it",
-                    author = "Author name $it"
+                    author = "Author name $it",
+                    repliesResult = ApiResult(
+                        resultType = ResultType.Listing,
+                        data = Data(
+                            children = (1..5).map { reply ->
+                                CommentData(
+                                    data = Comment(
+                                        body = "Reply $reply"
+                                    )
+                                )
+                            }
+                        )
+                    )
                 )
             }
         )

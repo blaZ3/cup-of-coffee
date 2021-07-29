@@ -22,6 +22,8 @@ data class Post(
     @Json(name = "upvote_ratio")
     val upvoteRatio: Float = -1f,
     val ups: Long = -1,
+    val downs: Long = -1,
+    val score: Long = -1,
     @Json(name = "total_awards_received")
     val totalAwardsReceived: Int = -1,
     @Json(name = "is_video")
@@ -66,7 +68,7 @@ data class Comment(
 ) {
     val replies: List<Comment>?
         get() = repliesResult?.data?.children?.mapNotNull {
-            (it as DataChild.CommentData).data
+            if (it is DataChild.CommentData) it.data else null
         }
 }
 

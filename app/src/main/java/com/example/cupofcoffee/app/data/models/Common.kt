@@ -1,5 +1,6 @@
 package com.example.cupofcoffee.app.data.models
 
+import com.example.cupofcoffee.app.data.models.ObjectKind.CommentRef
 import com.squareup.moshi.Json
 import se.ansman.kotshi.JsonDefaultValue
 import se.ansman.kotshi.JsonSerializable
@@ -30,7 +31,10 @@ enum class ObjectKind {
     Subreddit,
 
     @Json(name = "t6")
-    Award
+    Award,
+
+    @Transient
+    CommentRef
 }
 
 @JsonSerializable
@@ -54,7 +58,6 @@ data class Data(
 @Polymorphic(labelKey = "kind")
 sealed class DataChild(@Json(name = "kind") val kind: ObjectKind?) {
     @JsonSerializable
-    @JsonDefaultValue
     @PolymorphicLabel(value = "t3")
     data class PostData(
         val data: Post?
@@ -65,4 +68,9 @@ sealed class DataChild(@Json(name = "kind") val kind: ObjectKind?) {
     data class CommentData(
         val data: Comment?
     ) : DataChild(ObjectKind.Comment)
+
+    @JsonSerializable
+    @JsonDefaultValue
+    @PolymorphicLabel(value = "")
+    data class CommentReference(val id: String?) : DataChild(CommentRef)
 }

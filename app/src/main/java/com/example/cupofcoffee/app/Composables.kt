@@ -175,63 +175,86 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
 
 
 @Composable
+fun Comment(comment: Comment, isReply: Boolean = false) {
+    Column(modifier = Modifier.padding(4.dp)) {
+        comment.author?.let {
+            Text(text = comment.author, style = typography.body2)
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+        comment.body?.let {
+            Text(
+                text = comment.body,
+                style = typography.body1
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Row {
+            Text(
+                text = "${comment.ups} Up votes",
+                style = typography.body2
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${comment.downs} Down votes",
+                style = typography.body2
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+
+        Divider()
+    }
+
+    comment.replies?.forEach {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 8.dp)) {
+            Comment(comment = it, isReply = true)
+        }
+    }
+
+    if (!isReply) Divider(modifier = Modifier.height(2.dp))
+}
+
+
+@Composable
 fun PostDetail(post: Post, comments: List<Comment>?) {
     Column {
 
-        Column(modifier = Modifier.padding(4.dp)) {
-            post.title?.let {
-                Text(text = post.title, style = typography.h5)
-            }
-            if (post.isImage && post.cleanedImageUrl != null) {
-                Image(
-                    painter = rememberCoilPainter(
-                        request = post.cleanedImageUrl
-                    ),
-                    contentDescription = post.title,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .height(250.dp)
-                        .clip(shape = RoundedCornerShape(4.dp)),
-                    contentScale = Crop
-                )
-            }
-        }
-
-        Divider(modifier = Modifier.height(4.dp))
-        Spacer(modifier = Modifier.height(4.dp))
-
-        comments?.let {
-            LazyColumn {
-                items(comments) { comment ->
-                    comment.body?.let {
-                        Column(modifier = Modifier.padding(4.dp)) {
-                            comment.author?.let {
-                                Text(text = comment.author, style = typography.body2)
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
-                            Text(
-                                text = comment.body,
-                                style = typography.body1
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            Row {
-                                Text(
-                                    text = "${comment.ups} Up votes",
-                                    style = typography.body2
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "${comment.downs} Down votes",
-                                    style = typography.body2
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
-
-                        }
-                        Divider()
+        LazyColumn {
+            item(post.postFullName) {
+                Column(modifier = Modifier.padding(4.dp)) {
+                    post.title?.let {
+                        Text(text = post.title, style = typography.h6)
                     }
+                    if (post.isImage && post.cleanedImageUrl != null) {
+                        Image(
+                            painter = rememberCoilPainter(
+                                request = post.cleanedImageUrl
+                            ),
+                            contentDescription = post.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp)
+                                .clip(shape = RoundedCornerShape(4.dp)),
+                            contentScale = Crop
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "${post.ups} Up votes",
+                            style = typography.body2
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${post.downs} Down votes",
+                            style = typography.body2
+                        )
+                    }
+                }
+                Divider(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+            comments?.let {
+                items(comments) { comment ->
+                    Comment(comment = comment)
                 }
             }
         }

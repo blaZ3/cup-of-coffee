@@ -1,5 +1,6 @@
 package com.example.cupofcoffee.app.views.detail
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +15,6 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.cupofcoffee.Error.NetworkError
-import com.example.cupofcoffee.app.Loading
 import com.example.cupofcoffee.app.LoadingError
 import com.example.cupofcoffee.app.PostDetail
 import com.example.cupofcoffee.app.data.models.*
@@ -31,10 +31,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+@SuppressLint("ViewConstructor")
 class PostDetailView(
     context: Context,
-    private val subReddit: String,
-    private val postShortName: String
+    private val post: Post
 ) : AbstractComposeView(context) {
 
     private lateinit var log: Log
@@ -51,18 +51,18 @@ class PostDetailView(
         model = entryPoint.postDetailModel()
         findViewTreeLifecycleOwner()?.lifecycleScope?.let {
             scope = it
-            model.init(LifecycleManagedCoroutineScope(scope))
+            model.init(LifecycleManagedCoroutineScope(scope), post)
         }
         scope.launch {
-            model.actions.emit(LoadPostAndComments(subReddit, postShortName))
+            model.actions.emit(LoadPostAndComments)
         }
     }
 
     @Composable
     override fun Content() {
-        PostDetailScreen(viewState = model.viewState, log = log, onReload = {
+        PostDetailScreen(viewState = model.viewState, onReload = {
             scope.launch {
-                model.actions.emit(LoadPostAndComments(subReddit, postShortName))
+                model.actions.emit(LoadPostAndComments)
             }
         })
     }
@@ -80,21 +80,17 @@ class PostDetailView(
 @Composable
 internal fun PostDetailScreen(
     viewState: StateFlow<PostDetailViewState>,
-    log: Log? = null,
     onReload: () -> Unit
 ) {
     CupOfCoffeeTheme {
         viewState.collectAsState().value.let { state ->
             Column(modifier = Modifier.fillMaxSize()) {
-                if (state.isLoading) {
-                    Loading()
-                }
                 if (state.showLoadingError || state.post == null) {
                     LoadingError(error = NetworkError, onReload = onReload)
                 }
-                if (!state.isLoading && !state.showLoadingError && state.post != null) {
+                if (!state.showLoadingError && state.post != null) {
                     val flatComments = state.comments
-                    PostDetail(state.post, flatComments)
+                    PostDetail(state.post, state.isLoadingComments, flatComments)
                 }
             }
         }

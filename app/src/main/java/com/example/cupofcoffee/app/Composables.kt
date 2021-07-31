@@ -42,14 +42,14 @@ fun EmptyPosts(onReload: () -> Unit) {
 }
 
 @Composable
-fun Loading() {
+fun Loading(msg: String? = null) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = CenterHorizontally,
         verticalArrangement = Center
     ) {
         Text(
-            text = "Loading...",
+            text = msg ?: "Loading...",
             color = Purple700,
             style = typography.h6
         )
@@ -175,7 +175,7 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
 
 
 @Composable
-fun Comment(commentViewData: CommentViewData, isReply: Boolean = false) {
+fun Comment(commentViewData: CommentViewData) {
     Column(
         modifier = Modifier.padding(
             start = 8.dp * commentViewData.nesting,
@@ -212,7 +212,11 @@ fun Comment(commentViewData: CommentViewData, isReply: Boolean = false) {
 
 
 @Composable
-fun PostDetail(post: Post, comments: List<CommentViewData>?) {
+fun PostDetail(
+    post: Post,
+    isLoadingComments: Boolean = false,
+    comments: List<CommentViewData>?
+) {
     Column {
 
         LazyColumn {
@@ -249,11 +253,18 @@ fun PostDetail(post: Post, comments: List<CommentViewData>?) {
                 Divider(modifier = Modifier.height(4.dp))
                 Spacer(modifier = Modifier.height(4.dp))
             }
-            comments?.let {
-                items(comments) { comment ->
-                    Comment(commentViewData = comment)
+
+            if (isLoadingComments) {
+                items(1) { Loading("Loading comments...") }
+            } else {
+                comments?.let {
+                    items(comments) { comment ->
+                        Comment(commentViewData = comment)
+                    }
                 }
             }
+
+
         }
 
     }

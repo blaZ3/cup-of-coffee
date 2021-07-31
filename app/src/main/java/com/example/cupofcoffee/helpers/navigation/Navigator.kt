@@ -16,8 +16,7 @@ class AppNavigator(private val activity: AppCompatActivity) : Navigator {
         activity.startActivity(
             PostDetailActivity.getIntent(
                 activity,
-                post.subreddit,
-                post.postFullName?.asShortName()
+                post
             )
         )
     }

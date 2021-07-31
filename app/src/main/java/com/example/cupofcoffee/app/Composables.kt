@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -115,6 +116,7 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                 post.subreddit?.let {
                     Text(
                         text = "r/${post.subreddit}",
+                        color = colors.secondary,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
@@ -123,6 +125,7 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                     Text(
                         text = "[${stringResource(tag_oc)}]",
                         fontSize = 12.sp,
+                        color = colors.secondary,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 }
@@ -130,6 +133,7 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                     Text(
                         text = stringResource(tag_nsfw),
                         fontSize = 12.sp,
+                        color = colors.secondary,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 }
@@ -138,6 +142,7 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                 Text(
                     text = post.title,
                     style = typography.h5,
+                    color = colors.primary,
                     maxLines = 2,
                     overflow = Ellipsis
                 )
@@ -160,6 +165,7 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                 Text(
                     text = post.createdAtStr,
                     fontSize = 12.sp,
+                    color = colors.secondary,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -167,9 +173,14 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                     Text(
                         text = post.postFullName,
                         fontSize = 12.sp,
+                        color = colors.secondary,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 }
+            }
+
+            Row(modifier = Modifier.padding(4.dp)) {
+
             }
         }
     }

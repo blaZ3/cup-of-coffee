@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -66,18 +68,20 @@ class HomeView(
 
     @Composable
     override fun Content() {
-        HomeScreen(model.viewState, log,
-            onReloadPosts = {
-                scope.launch { model.actions.emit(Reload()) }
-            },
-            onPageEndReached = {
-                log.d("onPageEndReached")
-                scope.launch { model.actions.emit(LoadMore()) }
-            },
-            onPostClicked = {
-                navigator.navigateToPostDetail(it)
-            }
-        )
+        CupOfCoffeeTheme {
+            HomeScreen(model.viewState, log,
+                onReloadPosts = {
+                    scope.launch { model.actions.emit(Reload()) }
+                },
+                onPageEndReached = {
+                    log.d("onPageEndReached")
+                    scope.launch { model.actions.emit(LoadMore()) }
+                },
+                onPostClicked = {
+                    navigator.navigateToPostDetail(it)
+                }
+            )
+        }
     }
 
     @EntryPoint
@@ -97,39 +101,42 @@ private fun HomeScreen(
 ) {
     viewState.collectAsState().value.let { state ->
         log?.d("HomeScreen new state: $state")
-        CupOfCoffeeTheme {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                if (state.isLoading) {
-                    Loading()
-                }
-                if (state.showLoadingError) {
-                    LoadingError(NetworkError, onReload = onReloadPosts)
-                }
-                if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            if (state.isLoading) {
+                Loading()
+            }
+            if (state.showLoadingError) {
+                LoadingError(NetworkError, onReload = onReloadPosts)
+            }
+            if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
 
-                if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
-                    state.posts.let {
-                        val listState = rememberLazyListState()
-                        val lastIndex = remember { mutableStateOf(0) }
-                        Box {
-                            LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
-                                items(it) { post -> Post(post, onPostClicked) }
-                            }
-                            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
-                                if (it.index != lastIndex.value) {
-                                    lastIndex.value = it.index
-                                    if (lastIndex.value == listState.layoutInfo.totalItemsCount - 1) {
-                                        onPageEndReached()
-                                    }
+            if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
+                state.posts.let {
+                    val listState = rememberLazyListState()
+                    val lastIndex = remember { mutableStateOf(0) }
+                    Box {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(colors.background)
+                        ) {
+                            items(it) { post -> Post(post, onPostClicked) }
+                        }
+                        listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
+                            if (it.index != lastIndex.value) {
+                                lastIndex.value = it.index
+                                if (lastIndex.value == listState.layoutInfo.totalItemsCount - 1) {
+                                    onPageEndReached()
                                 }
                             }
+                        }
 
-                            if (state.isPaginating) {
-                                PaginationIndicator(modifier = Modifier.align(BottomCenter))
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
+                        if (state.isPaginating) {
+                            PaginationIndicator(modifier = Modifier.align(BottomCenter))
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
@@ -192,10 +199,12 @@ private fun HomeComposePreview() {
             isPaginating = true
         )
     )
-    HomeScreen(
-        viewState = state,
-        onReloadPosts = {},
-        onPageEndReached = {},
-        onPostClicked = {}
-    )
+    CupOfCoffeeTheme(darkTheme = true) {
+        HomeScreen(
+            viewState = state,
+            onReloadPosts = {},
+            onPageEndReached = {},
+            onPostClicked = {}
+        )
+    }
 }

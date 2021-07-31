@@ -96,7 +96,7 @@ private fun HomeScreen(
     onPostClicked: (post: Post) -> Unit
 ) {
     viewState.collectAsState().value.let { state ->
-        log?.d("HomeView new state: $state")
+        log?.d("HomeScreen new state: $state")
         CupOfCoffeeTheme {
             Column(
                 modifier = Modifier.fillMaxSize(),

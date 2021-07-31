@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Cup of coffee</string>
     <string translatable="false" name="title_activity_post_detail">PostDetailActivity</string>
+    <string name="empty_posts">Empty posts</string>
+    <string name="reload_posts">Reload posts</string>
+    <string name="posts_pagination_message">Loading more posts...</string>
+    <string name="network_error">Network error</string>
+    <string name="msg_reload">Try reloading</string>
+    <string name="reload">Reload</string>
+    <string name="tag_oc">OC</string>
+    <string name="tag_nsfw">NSFW</string>
+    <string name="loading_comments">Loading comments...</string>
+    <string name="label_down_votes">Down votes</string>
+    <string name="label_up_votes">Up votes</string>
 </resources>

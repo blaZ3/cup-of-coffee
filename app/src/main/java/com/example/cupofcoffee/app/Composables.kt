@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cupofcoffee.Error
 import com.example.cupofcoffee.Error.NetworkError
+import com.example.cupofcoffee.R.string.*
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.views.detail.CommentViewData
 import com.example.cupofcoffee.ui.theme.Purple700
@@ -34,9 +36,9 @@ fun EmptyPosts(onReload: () -> Unit) {
         horizontalAlignment = CenterHorizontally,
         verticalArrangement = Center
     ) {
-        Text(text = "Empty posts")
+        Text(text = stringResource(empty_posts))
         Button(onClick = onReload) {
-            Text(text = "Reload posts")
+            Text(text = stringResource(reload_posts))
         }
     }
 }
@@ -63,7 +65,7 @@ fun PaginationIndicator(modifier: Modifier) {
         horizontalAlignment = CenterHorizontally
     ) {
         Text(
-            text = "Loading more posts..."
+            text = stringResource(posts_pagination_message)
         )
     }
 }
@@ -83,17 +85,17 @@ fun NetworkError(onReload: () -> Unit) {
         verticalArrangement = Center
     ) {
         Text(
-            text = "Network error",
+            text = stringResource(network_error),
             style = typography.h5
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Try reloading",
+            text = stringResource(msg_reload),
             style = typography.body1
         )
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onReload) {
-            Text(text = "Reload")
+            Text(text = stringResource(reload))
         }
     }
 }
@@ -119,14 +121,14 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                 }
                 if (post.isOriginalContent) {
                     Text(
-                        text = "[OC]",
+                        text = "[${stringResource(tag_oc)}]",
                         fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 }
                 if (post.over18) {
                     Text(
-                        text = "NSFW",
+                        text = stringResource(tag_nsfw),
                         fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
@@ -240,12 +242,12 @@ fun PostDetail(
                     }
                     Row {
                         Text(
-                            text = "${post.ups} Up votes",
+                            text = "${post.ups} ${stringResource(label_up_votes)}",
                             style = typography.body2
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${post.downs} Down votes",
+                            text = "${post.downs} ${stringResource(label_down_votes)}",
                             style = typography.body2
                         )
                     }
@@ -255,7 +257,7 @@ fun PostDetail(
             }
 
             if (isLoadingComments) {
-                items(1) { Loading("Loading comments...") }
+                items(1) { Loading(stringResource(loading_comments)) }
             } else {
                 comments?.let {
                     items(comments) { comment ->

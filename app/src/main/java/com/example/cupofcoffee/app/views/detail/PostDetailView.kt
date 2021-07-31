@@ -60,7 +60,7 @@ class PostDetailView(
 
     @Composable
     override fun Content() {
-        PostDetailScreen(viewState = model.viewState, onReload = {
+        PostDetailScreen(viewState = model.viewState, log = log, onReload = {
             scope.launch {
                 model.actions.emit(LoadPostAndComments)
             }
@@ -80,10 +80,12 @@ class PostDetailView(
 @Composable
 internal fun PostDetailScreen(
     viewState: StateFlow<PostDetailViewState>,
+    log: Log? = null,
     onReload: () -> Unit
 ) {
     CupOfCoffeeTheme {
         viewState.collectAsState().value.let { state ->
+            log?.d("PostDetailScreen new state: $state")
             Column(modifier = Modifier.fillMaxSize()) {
                 if (state.showLoadingError || state.post == null) {
                     LoadingError(error = NetworkError, onReload = onReload)

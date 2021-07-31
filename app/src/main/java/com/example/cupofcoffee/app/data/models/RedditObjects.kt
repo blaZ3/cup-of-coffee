@@ -1,9 +1,13 @@
 package com.example.cupofcoffee.app.data.models
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
+@Parcelize
 data class Post(
     val title: String? = null,
     @Json(name = "name")
@@ -21,19 +25,23 @@ data class Post(
     val preview: Preview? = null,
     @Json(name = "upvote_ratio")
     val upvoteRatio: Float = -1f,
-    val ups: Long = -1,
-    val downs: Long = -1,
-    val score: Long = -1,
+    val ups: Long = 0,
+    val downs: Long = 0,
+    val score: Long = 0,
     @Json(name = "total_awards_received")
     val totalAwardsReceived: Int = -1,
     @Json(name = "is_video")
     val isVideo: Boolean = false,
 
 
-    ) {
+    ) : Parcelable {
     val isText: Boolean get() = !isVideo && preview == null
     val isImage: Boolean get() = !isVideo && preview != null
+
+    @IgnoredOnParcel
     val createdAtStr = created.toString()
+
+    @IgnoredOnParcel
     val cleanedImageUrl: String? = preview?.images?.first()?.source?.getCleanedUrl()
 }
 

@@ -78,7 +78,7 @@ class PostDetailView(
 
 
 @Composable
-fun PostDetailScreen(
+internal fun PostDetailScreen(
     viewState: StateFlow<PostDetailViewState>,
     log: Log? = null,
     onReload: () -> Unit
@@ -93,7 +93,8 @@ fun PostDetailScreen(
                     LoadingError(error = NetworkError, onReload = onReload)
                 }
                 if (!state.isLoading && !state.showLoadingError && state.post != null) {
-                    PostDetail(state.post, state.comments)
+                    val flatComments = state.comments
+                    PostDetail(state.post, flatComments)
                 }
             }
         }
@@ -137,7 +138,7 @@ fun PostDetailScreenPreview() {
                         )
                     )
                 )
-            }
+            }.flatten()
         )
     )
     PostDetailScreen(viewState = viewState) {

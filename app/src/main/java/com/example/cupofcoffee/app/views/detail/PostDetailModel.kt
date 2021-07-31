@@ -5,10 +5,12 @@ import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.InitAction
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class PostDetailModel @Inject constructor(
@@ -42,23 +44,27 @@ internal class PostDetailModel @Inject constructor(
                         isLoading = true
                     )
                     internalViewState.emit(currState)
-                    val result = postRepository.getPostDetail(action.subReddit, action.postShortName)
-                    currState = if (result?.post != null) {
-                        currState.copy(
-                            isLoading = false,
-                            showLoadingError = false,
-                            post = result.post,
-                            comments = result.comments
-                        )
+                    val result =
+                        postRepository.getPostDetail(action.subReddit, action.postShortName)
+                    if (result?.post != null) {
+                        scope.launch(IO) {
+                            val flatComments = result.comments?.flatten()
+                            currState = currState.copy(
+                                isLoading = false,
+                                showLoadingError = false,
+                                post = result.post,
+                                comments = flatComments
+                            )
+                            internalViewState.emit(currState)
+                        }
                     } else {
-                        currState.copy(
+                        currState = currState.copy(
                             isLoading = false,
                             showLoadingError = true
                         )
+                        internalViewState.emit(currState)
                     }
-                    internalViewState.emit(currState)
                 }
-
             }
         }
     }
@@ -74,11 +80,31 @@ data class PostDetailViewState(
     val postShortName: String? = null,
 
     val post: Post? = null,
-    val comments: List<Comment>? = null
+    val comments: List<CommentViewData>? = null
 )
 
 
 sealed class PostDetailAction {
     object InitAction : PostDetailAction()
-    data class LoadPostAndComments(val subReddit: String, val postShortName: String) : PostDetailAction()
+    data class LoadPostAndComments(val subReddit: String, val postShortName: String) :
+        PostDetailAction()
 }
+
+internal fun List<Comment>?.flatten(): List<CommentViewData> {
+    val flatList = arrayListOf<CommentViewData>()
+    this?.forEach { comment -> doFlatten(flatList, comment, 0) }
+    return flatList
+}
+
+private fun doFlatten(flattenList: ArrayList<CommentViewData>, comment: Comment, level: Int) {
+    flattenList.add(CommentViewData(comment, level))
+    comment.replies?.forEach {
+        doFlatten(flattenList, it, level + 1)
+    }
+}
+
+data class CommentViewData(
+    val comment: Comment,
+    val nesting: Int = 0,
+    val isHidden: Boolean = false
+)

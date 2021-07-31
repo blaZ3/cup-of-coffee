@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cupofcoffee.Error
 import com.example.cupofcoffee.Error.NetworkError
-import com.example.cupofcoffee.app.data.models.Comment
 import com.example.cupofcoffee.app.data.models.Post
+import com.example.cupofcoffee.app.views.detail.CommentViewData
 import com.example.cupofcoffee.ui.theme.Purple700
 import com.google.accompanist.coil.rememberCoilPainter
 
@@ -175,27 +175,32 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
 
 
 @Composable
-fun Comment(comment: Comment, isReply: Boolean = false) {
-    Column(modifier = Modifier.padding(4.dp)) {
-        comment.author?.let {
-            Text(text = comment.author, style = typography.body2)
+fun Comment(commentViewData: CommentViewData, isReply: Boolean = false) {
+    Column(
+        modifier = Modifier.padding(
+            start = 8.dp * commentViewData.nesting,
+            top = 4.dp
+        )
+    ) {
+        commentViewData.comment.author?.let {
+            Text(text = commentViewData.comment.author, style = typography.body2)
             Spacer(modifier = Modifier.height(4.dp))
         }
-        comment.body?.let {
+        commentViewData.comment.body?.let {
             Text(
-                text = comment.body,
+                text = commentViewData.comment.body,
                 style = typography.body1
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Row {
             Text(
-                text = "${comment.ups} Up votes",
+                text = "${commentViewData.comment.ups} Up votes",
                 style = typography.body2
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "${comment.downs} Down votes",
+                text = "${commentViewData.comment.downs} Down votes",
                 style = typography.body2
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -203,19 +208,11 @@ fun Comment(comment: Comment, isReply: Boolean = false) {
 
         Divider()
     }
-
-    comment.replies?.forEach {
-        Column(modifier = Modifier.padding(start = 16.dp, top = 8.dp)) {
-            Comment(comment = it, isReply = true)
-        }
-    }
-
-    if (!isReply) Divider(modifier = Modifier.height(2.dp))
 }
 
 
 @Composable
-fun PostDetail(post: Post, comments: List<Comment>?) {
+fun PostDetail(post: Post, comments: List<CommentViewData>?) {
     Column {
 
         LazyColumn {
@@ -254,7 +251,7 @@ fun PostDetail(post: Post, comments: List<Comment>?) {
             }
             comments?.let {
                 items(comments) { comment ->
-                    Comment(comment = comment)
+                    Comment(commentViewData = comment)
                 }
             }
         }

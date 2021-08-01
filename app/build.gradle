@@ -90,6 +90,9 @@ dependencies {
     implementation "io.coil-kt:coil:1.2.2"
     implementation "com.google.accompanist:accompanist-coil:0.11.1"
 
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+    implementation "com.airbnb.android:lottie-compose:$lottieVersion"
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1'

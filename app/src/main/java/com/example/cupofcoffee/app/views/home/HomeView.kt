@@ -154,7 +154,7 @@ private fun HomeComposePreview() {
         authorFullName = "author",
         isOriginalContent = false,
         over18 = true,
-        created = 1623015981,
+        createdUTC = 1623015981,
         ups = 10_000L,
         spoiler = true,
         totalAwardsReceived = 10
@@ -200,6 +200,71 @@ private fun HomeComposePreview() {
         )
     )
     CupOfCoffeeTheme(darkTheme = true) {
+        HomeScreen(
+            viewState = state,
+            onReloadPosts = {},
+            onPageEndReached = {},
+            onPostClicked = {}
+        )
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun HomeComposePreviewLight() {
+    val post = Post(
+        title = "Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 ",
+        subreddit = "subreddit",
+        author = "authorName",
+        authorFullName = "t2_dfgdfgf",
+        isOriginalContent = false,
+        over18 = true,
+        createdUTC = 1627786704,
+        ups = 10_000L,
+        spoiler = true,
+        totalAwardsReceived = 10
+    )
+    val state = MutableStateFlow(
+        HomeViewState(
+            posts = listOf(
+                post,
+                post.copy(
+                    title = "Title 2",
+                    isVideo = false,
+                    isOriginalContent = true,
+                    preview = com.example.cupofcoffee.app.data.models.Preview(
+                        images = listOf(
+                            PreviewImage(
+                                source = ImageSource(url = "")
+                            )
+                        )
+                    )
+                ),
+                post.copy(
+                    title = "Title 2",
+                    isVideo = false,
+                    isOriginalContent = true,
+                    preview = com.example.cupofcoffee.app.data.models.Preview(
+                        images = listOf(
+                            PreviewImage(
+                                source = ImageSource(url = "")
+                            )
+                        )
+                    )
+                ),
+                post.copy(title = "Title 3"),
+                post.copy(title = "Title 4"),
+                post.copy(title = "Title 5"),
+                post.copy(title = "Title 6"),
+                post.copy(title = "Title 7")
+            ),
+            isLoading = false,
+            showLoadingError = false,
+            showEmptyPosts = false,
+            isPaginating = true
+        )
+    )
+    CupOfCoffeeTheme(darkTheme = false) {
         HomeScreen(
             viewState = state,
             onReloadPosts = {},

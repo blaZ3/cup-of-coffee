@@ -1,6 +1,7 @@
 package com.example.cupofcoffee.app.data.models
 
 import android.os.Parcelable
+import com.example.cupofcoffee.helpers.datentime.toTimeAgo
 import com.squareup.moshi.Json
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -21,7 +22,8 @@ data class Post(
     @Json(name = "over_18")
     val over18: Boolean = false,
     val spoiler: Boolean = false,
-    val created: Long = -1,
+    @Json(name = "created_utc")
+    val createdUTC: Long = 0,
     val preview: Preview? = null,
     @Json(name = "upvote_ratio")
     val upvoteRatio: Float = -1f,
@@ -32,14 +34,19 @@ data class Post(
     val totalAwardsReceived: Int = -1,
     @Json(name = "is_video")
     val isVideo: Boolean = false,
-
+    val permalink: String? = null,
+    @Json(name = "num_comments")
+    val numComments: Int = 0,
 
     ) : Parcelable {
     val isText: Boolean get() = !isVideo && preview == null
     val isImage: Boolean get() = !isVideo && preview != null
 
     @IgnoredOnParcel
-    val createdAtStr = created.toString()
+    val createdAtStr = createdUTC.toString()
+
+    @IgnoredOnParcel
+    val createdAgo = createdUTC.toTimeAgo()
 
     @IgnoredOnParcel
     val cleanedImageUrl: String? = preview?.images?.first()?.source?.getCleanedUrl()
@@ -71,7 +78,7 @@ data class Comment(
     val name: String? = null,
     val created: Long = 0,
     @Json(name = "created_utc")
-    val createdUTC: Long = 0,
+    val createdUTC: Double = 0.0,
     val subreddit: String? = null,
 ) {
     val replies: List<Comment>?

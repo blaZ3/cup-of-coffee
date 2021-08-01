@@ -109,7 +109,7 @@ fun PostDetailScreenPreview() {
         authorFullName = "author",
         isOriginalContent = false,
         over18 = true,
-        created = 1623015981,
+        createdUTC = 1623015981,
         ups = 10_000L,
         spoiler = true,
         totalAwardsReceived = 10

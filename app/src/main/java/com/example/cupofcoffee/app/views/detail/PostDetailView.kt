@@ -110,7 +110,8 @@ fun PostDetailScreenPreview() {
         isOriginalContent = false,
         over18 = true,
         createdUTC = 1623015981,
-        ups = 10_000L,
+        score = 10_000L,
+        upvoteRatio = 0.75f,
         spoiler = true,
         totalAwardsReceived = 10
     )
@@ -129,6 +130,8 @@ fun PostDetailScreenPreview() {
                             children = (1..5).map { reply ->
                                 CommentData(
                                     data = Comment(
+                                        authorFullName = "Author name $it-$reply",
+                                        author = "Author name $it-$reply",
                                         body = "Reply $reply"
                                     )
                                 )

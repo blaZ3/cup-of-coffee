@@ -1,11 +1,14 @@
 package com.example.cupofcoffee.app.data.models
 
 import android.os.Parcelable
+import androidx.compose.ui.res.stringResource
+import com.example.cupofcoffee.R
 import com.example.cupofcoffee.helpers.datentime.toTimeAgo
 import com.squareup.moshi.Json
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import se.ansman.kotshi.JsonSerializable
+import java.lang.StringBuilder
 
 @JsonSerializable
 @Parcelize
@@ -26,8 +29,7 @@ data class Post(
     val createdUTC: Long = 0,
     val preview: Preview? = null,
     @Json(name = "upvote_ratio")
-    val upvoteRatio: Float = -1f,
-    val ups: Long = 0,
+    val upvoteRatio: Float = 1f,
     val downs: Long = 0,
     val score: Long = 0,
     @Json(name = "total_awards_received")
@@ -50,6 +52,31 @@ data class Post(
 
     @IgnoredOnParcel
     val cleanedImageUrl: String? = preview?.images?.first()?.source?.getCleanedUrl()
+
+    @IgnoredOnParcel
+    val downVotes: Int
+        get() = score.toFloat().times(1.0 - upvoteRatio).toInt()
+
+    @IgnoredOnParcel
+    val upVotes: Int
+        get() = score.toFloat().times(upvoteRatio).toInt()
+
+
+    @IgnoredOnParcel
+    val postedInfo: String
+        get() {
+            val postedInfoSB = StringBuilder()
+            subreddit?.let {
+                postedInfoSB.append("Posted on r/${subreddit}")
+            }
+            author?.let {
+                postedInfoSB.append(" by u/${author}")
+            }
+            createdAgo?.let {
+                postedInfoSB.append(" $createdAgo ago")
+            }
+            return postedInfoSB.toString()
+        }
 }
 
 
@@ -71,6 +98,8 @@ data class Comment(
     val author: String? = null,
     val downs: Int = 0,
     val ups: Int = 0,
+    @Json(name = "upvote_ratio")
+    val upvoteRatio: Float = 1f,
     val score: Int = 0,
     @Json(name = "subreddit_id")
     val subredditId: String? = null,
@@ -81,10 +110,14 @@ data class Comment(
     val createdUTC: Double = 0.0,
     val subreddit: String? = null,
 ) {
+    @IgnoredOnParcel
     val replies: List<Comment>?
         get() = repliesResult?.data?.children?.mapNotNull {
             if (it is DataChild.CommentData) it.data else null
         }
+
+    @IgnoredOnParcel
+    val downVotes: Int = ups.toFloat().div(upvoteRatio).times(1.0 - upvoteRatio).toInt()
 }
 
 

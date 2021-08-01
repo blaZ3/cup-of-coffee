@@ -13,21 +13,26 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cupofcoffee.Error
 import com.example.cupofcoffee.Error.NetworkError
 import com.example.cupofcoffee.R.string.*
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.views.detail.CommentViewData
-import com.example.cupofcoffee.ui.theme.Purple700
 import com.google.accompanist.coil.rememberCoilPainter
+import java.lang.StringBuilder
 
 
 @Composable
@@ -45,27 +50,46 @@ fun EmptyPosts(onReload: () -> Unit) {
 
 @Composable
 fun Loading(msg: String? = null) {
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.Asset("loading.json"),
+    )
+    val progress by animateLottieCompositionAsState(composition)
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = CenterHorizontally,
         verticalArrangement = Center
     ) {
+        LottieAnimation(
+            modifier = Modifier
+                .height(50.dp)
+                .width(150.dp),
+            composition = composition,
+            progress = progress
+        )
         Text(
-            text = msg ?: "Loading...",
-            color = Purple700,
-            style = typography.h6
+            text = msg ?: "Loading",
+            style = typography.body1
         )
     }
 }
 
 @Composable
 fun PaginationIndicator(modifier: Modifier) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = CenterHorizontally
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.Asset("loading.json"),
+    )
+    val progress by animateLottieCompositionAsState(composition)
+
+    Card(
+        modifier = modifier.padding(8.dp)
     ) {
-        Text(
-            text = stringResource(posts_pagination_message)
+        LottieAnimation(
+            modifier = Modifier
+                .height(50.dp)
+                .width(150.dp),
+            composition = composition,
+            progress = progress
         )
     }
 }
@@ -108,51 +132,35 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
             .fillMaxWidth()
             .clickable(true) { onPostClicked(post) }
     ) {
-        Column(
-            modifier = Modifier.padding(4.dp)
-        ) {
-            Row {
-                post.subreddit?.let {
-                    Text(
-                        text = "Posted on r/${post.subreddit}",
-                        style = typography.body2,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    )
-                }
-                post.author?.let {
-                    Text(
-                        text = " by u/${post.author}",
-                        style = typography.body2
-                    )
-                }
-            }
-            Row {
-                if (post.isOriginalContent) {
-                    Text(
-                        text = "[${stringResource(tag_oc)}]",
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    )
-                }
-                if (post.over18) {
-                    Text(
-                        text = stringResource(tag_nsfw),
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            post.createdAgo?.let {
+        Column(modifier = Modifier.padding(4.dp)) {
+            if (post.postedInfo.isNotEmpty()) {
                 Text(
-                    text = " ${post.createdAgo} ago",
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(4.dp),
+                    text = post.postedInfo,
+                    style = typography.body2,
                 )
             }
+
+            val tagSB = StringBuilder()
+            if (post.isOriginalContent) {
+                tagSB.append("[${stringResource(tag_oc)}]")
+            }
+            if (post.over18) {
+                tagSB.append(" ${stringResource(tag_nsfw)}")
+            }
+            val tags = tagSB.toString()
+            if (tags.isNotEmpty()) {
+                Text(
+                    modifier = Modifier.padding(4.dp),
+                    text = tags,
+                    style = typography.body2
+                )
+            }
+
             Spacer(modifier = Modifier.height(4.dp))
             post.title?.let {
                 Text(
+                    modifier = Modifier.padding(4.dp),
                     text = post.title,
                     style = typography.h5,
                     maxLines = 2,
@@ -167,29 +175,37 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
                     contentDescription = post.title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
+                        .padding(4.dp)
                         .height(250.dp)
                         .clip(shape = RoundedCornerShape(4.dp)),
                     contentScale = Crop
                 )
+            } else {
+                Spacer(modifier = Modifier.height(4.dp))
             }
-            Row(modifier = Modifier.padding(top = 4.dp)) {
-                post.postFullName?.let {
-                    Text(
-                        text = post.postFullName,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    )
-                }
-            }
-
-            Row(modifier = Modifier.padding(4.dp)) {
-
+            Divider()
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text(
+                    text = "${post.upVotes} Ups",
+                    style = typography.body2
+                )
+                Text(
+                    text = "${post.downVotes} Downs",
+                    style = typography.body2
+                )
+                Text(
+                    text = "${post.numComments} Comments",
+                    style = typography.body2
+                )
             }
         }
     }
 }
-
 
 @Composable
 fun Comment(commentViewData: CommentViewData) {
@@ -200,33 +216,31 @@ fun Comment(commentViewData: CommentViewData) {
         )
     ) {
         commentViewData.comment.author?.let {
-            Text(text = commentViewData.comment.author, style = typography.body2)
-            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                modifier = Modifier.padding(4.dp),
+                text = "u/${commentViewData.comment.author}",
+                style = typography.body2
+            )
         }
+        Spacer(modifier = Modifier.height(4.dp))
         commentViewData.comment.body?.let {
             Text(
+                modifier = Modifier.padding(4.dp),
                 text = commentViewData.comment.body,
                 style = typography.body1
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Row {
-            Text(
-                text = "${commentViewData.comment.ups} Up votes",
-                style = typography.body2
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "${commentViewData.comment.downs} Down votes",
-                style = typography.body2
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-
+        Divider()
+        Text(
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth(),
+            text = "${commentViewData.comment.score} Score",
+            style = typography.body2
+        )
         Divider()
     }
 }
-
 
 @Composable
 fun PostDetail(
@@ -235,12 +249,19 @@ fun PostDetail(
     comments: List<CommentViewData>?
 ) {
     Column {
-
         LazyColumn {
             item(post.postFullName) {
                 Column(modifier = Modifier.padding(4.dp)) {
+                    Text(
+                        modifier = Modifier.padding(4.dp),
+                        text = post.postedInfo,
+                        style = typography.body2
+                    )
                     post.title?.let {
-                        Text(text = post.title, style = typography.h6)
+                        Text(
+                            text = post.title,
+                            style = typography.h5
+                        )
                     }
                     if (post.isImage && post.cleanedImageUrl != null) {
                         Image(
@@ -252,17 +273,26 @@ fun PostDetail(
                                 .fillMaxWidth()
                                 .padding(top = 4.dp)
                                 .clip(shape = RoundedCornerShape(4.dp)),
-                            contentScale = Crop
+                            contentScale = FillWidth
                         )
                     }
-                    Row {
+                    Divider()
+                    Row(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
                         Text(
-                            text = "${post.ups} ${stringResource(label_up_votes)}",
+                            text = "${post.upVotes} Ups",
                             style = typography.body2
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${post.downs} ${stringResource(label_down_votes)}",
+                            text = "${post.downVotes} Downs",
+                            style = typography.body2
+                        )
+                        Text(
+                            text = "${post.numComments} Comments",
                             style = typography.body2
                         )
                     }
@@ -270,7 +300,6 @@ fun PostDetail(
                 Divider(modifier = Modifier.height(4.dp))
                 Spacer(modifier = Modifier.height(4.dp))
             }
-
             if (isLoadingComments) {
                 items(1) { Loading(stringResource(loading_comments)) }
             } else {
@@ -280,9 +309,6 @@ fun PostDetail(
                     }
                 }
             }
-
-
         }
-
     }
 }

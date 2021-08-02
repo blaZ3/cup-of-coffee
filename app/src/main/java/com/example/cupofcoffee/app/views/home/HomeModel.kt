@@ -40,7 +40,7 @@ internal class HomeModel @Inject constructor(
                         showEmptyPosts = false,
                         isPaginating = false
                     )
-                    internalViewState.emit(currState)
+                    internalViewState.emit(currState.copy(from = "InitAction"))
                     loadPosts()
                 }
             }
@@ -52,14 +52,14 @@ internal class HomeModel @Inject constructor(
                         showEmptyPosts = false,
                         isPaginating = false
                     )
-                    internalViewState.emit(currState)
+                    internalViewState.emit(currState.copy(from = "Reload"))
                     loadPosts()
                 }
             }
             is LoadMore -> {
                 scope.launch {
                     currState = currState.copy(isPaginating = true)
-                    internalViewState.emit(currState)
+                    internalViewState.emit(currState.copy(from = "LoadMore"))
                 }
                 loadPosts()
             }
@@ -67,6 +67,7 @@ internal class HomeModel @Inject constructor(
     }
 
     private fun loadPosts() {
+        log.d("loadPosts")
         scope.launch {
             val result = postRepo.getPosts(
                 currState.subreddit,
@@ -90,7 +91,7 @@ internal class HomeModel @Inject constructor(
                     showLoadingError = true
                 )
             }
-            internalViewState.emit(currState)
+            internalViewState.emit(currState.copy(from = "loadPosts"))
         }
     }
 
@@ -104,6 +105,7 @@ data class HomeViewState(
     val isPaginating: Boolean = false,
     val posts: List<Post> = arrayListOf(),
     val after: String? = null,
+    val from: String = ""
 )
 
 sealed class HomeAction {

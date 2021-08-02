@@ -1,12 +1,14 @@
 package com.example.cupofcoffee.app.views.detail
 
+import com.example.cupofcoffee.IODispatcher
 import com.example.cupofcoffee.app.data.models.Comment
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.models.asShortName
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.InitAction
+import com.example.cupofcoffee.app.views.detail.PostDetailAction.LoadPostAndComments
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -15,7 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class PostDetailModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
     private lateinit var scope: ManagedCoroutineScope
@@ -53,7 +56,7 @@ internal class PostDetailModel @Inject constructor(
             InitAction -> {
                 // do nothing
             }
-            is PostDetailAction.LoadPostAndComments -> {
+            is LoadPostAndComments -> {
                 if (currState.subReddit.isEmpty() || currState.postShortName.isEmpty()) return
                 scope.launch {
                     currState = currState.copy(isLoadingComments = true)
@@ -61,7 +64,7 @@ internal class PostDetailModel @Inject constructor(
                     val result =
                         postRepository.getPostDetail(currState.subReddit, currState.postShortName)
                     if (result?.post != null) {
-                        scope.launch(IO) {
+                        scope.launch(ioDispatcher) {
                             val flatComments = result.comments?.flatten()
                             currState = currState.copy(
                                 isLoadingComments = false,

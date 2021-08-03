@@ -110,7 +110,7 @@ internal fun List<Comment>?.flatten(): List<CommentViewData> {
 }
 
 private fun doFlatten(flattenList: ArrayList<CommentViewData>, comment: Comment, level: Int) {
-    flattenList.add(CommentViewData(comment, level))
+    flattenList.add(CommentViewData(comment.copy(repliesResult = null), level))
     comment.replies?.forEach {
         doFlatten(flattenList, it, level + 1)
     }

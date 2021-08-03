@@ -13,15 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CupOfCoffee"
         android:networkSecurityConfig="@xml/network_security_config">
-
-        <activity
-            android:name=".helpers.test.EmptyActivity"
-            android:exported="true" />
-        <activity
-            android:name=".app.views.detail.PostDetailActivity"
-            android:exported="true"
-            android:label="@string/title_activity_post_detail"
-            android:theme="@style/Theme.CupOfCoffee.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -31,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".app.views.detail.PostDetailActivity"
+            android:exported="true"
+            android:label="@string/title_activity_post_detail"
+            android:theme="@style/Theme.CupOfCoffee.NoActionBar" />
+        <activity
+            android:name=".helpers.test.EmptyActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

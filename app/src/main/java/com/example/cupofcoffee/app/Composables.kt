@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.layout.ContentScale.Companion.FillWidth
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -32,7 +34,6 @@ import com.example.cupofcoffee.R.string.*
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.views.detail.CommentViewData
 import com.google.accompanist.coil.rememberCoilPainter
-import java.lang.StringBuilder
 
 
 @Composable
@@ -160,11 +161,15 @@ fun Post(post: Post, onPostClicked: (post: Post) -> Unit) {
             Spacer(modifier = Modifier.height(4.dp))
             post.title?.let {
                 Text(
-                    modifier = Modifier.padding(4.dp),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .semantics {
+                            testTag = "post-title"
+                        },
                     text = post.title,
                     style = typography.h5,
                     maxLines = 2,
-                    overflow = Ellipsis
+                    overflow = Ellipsis,
                 )
             }
             if (post.isImage && post.cleanedImageUrl != null) {
@@ -225,7 +230,9 @@ fun Comment(commentViewData: CommentViewData) {
         Spacer(modifier = Modifier.height(4.dp))
         commentViewData.comment.body?.let {
             Text(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier
+                    .padding(4.dp)
+                    .semantics { testTag = "comment-body" },
                 text = commentViewData.comment.body,
                 style = typography.body1
             )
@@ -234,7 +241,8 @@ fun Comment(commentViewData: CommentViewData) {
         Text(
             modifier = Modifier
                 .padding(4.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .semantics { testTag = "comment-score" },
             text = "${commentViewData.comment.score} Score",
             style = typography.body2
         )
@@ -259,6 +267,9 @@ fun PostDetail(
                     )
                     post.title?.let {
                         Text(
+                            modifier = Modifier.semantics {
+                                testTag = "post-detail-title"
+                            },
                             text = post.title,
                             style = typography.h5
                         )

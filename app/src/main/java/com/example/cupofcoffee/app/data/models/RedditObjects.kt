@@ -30,7 +30,6 @@ data class Post(
     val preview: Preview? = null,
     @Json(name = "upvote_ratio")
     val upvoteRatio: Float = 1f,
-    val downs: Long = 0,
     val score: Long = 0,
     @Json(name = "total_awards_received")
     val totalAwardsReceived: Int = -1,

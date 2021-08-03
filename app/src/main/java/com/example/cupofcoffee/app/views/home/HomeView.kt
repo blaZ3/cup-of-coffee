@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme.colors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
@@ -37,8 +34,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors.fromActivity
 import dagger.hilt.android.components.ActivityComponent
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
@@ -94,54 +90,58 @@ class HomeView(
 
 @Composable
 private fun HomeScreen(
-    viewState: StateFlow<HomeViewState>, log: Log? = null,
+    viewState: StateFlow<HomeViewState>,
+    log: Log? = null,
     onReloadPosts: () -> Unit,
     onPageEndReached: () -> Unit,
     onPostClicked: (post: Post) -> Unit
 ) {
-    viewState.collectAsState().value.let { state ->
-        log?.d("HomeScreen new state: $state")
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            if (state.isLoading) {
-                Loading()
-            }
-            if (state.showLoadingError) {
-                LoadingError(NetworkError, onReload = onReloadPosts)
-            }
-            if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
+    val state by viewState.collectAsState()
+    log?.d("HomeScreen new state: $state")
+    Column(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        if (state.isLoading) {
+            Loading()
+        }
+        if (state.showLoadingError) {
+            LoadingError(NetworkError, onReload = onReloadPosts)
+        }
 
-            if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
-                state.posts.let {
+        if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
+
+        if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
+            state.posts.let {
+                Box {
                     val listState = rememberLazyListState()
-                    val lastIndex = remember { mutableStateOf(0) }
-                    Box {
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(colors.background)
-                        ) {
-                            items(it) { post -> Post(post, onPostClicked) }
-                        }
-                        listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
-                            if (it.index != lastIndex.value) {
-                                lastIndex.value = it.index
-                                if (lastIndex.value == listState.layoutInfo.totalItemsCount - 1) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colors.background)
+                    ) {
+                        items(it) { post -> Post(post, onPostClicked) }
+                    }
+
+                    LaunchedEffect(listState) {
+                        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
+                            .mapNotNull { it?.index }
+                            .distinctUntilChanged()
+                            .collect {
+                                if (it >= listState.layoutInfo.totalItemsCount - 1) {
                                     onPageEndReached()
                                 }
                             }
-                        }
+                    }
 
-                        if (state.isPaginating) {
-                            PaginationIndicator(modifier = Modifier.align(BottomCenter))
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
+                    if (state.isPaginating) {
+                        PaginationIndicator(modifier = Modifier.align(BottomCenter))
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
+
     }
 }
 

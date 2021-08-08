@@ -1,0 +1,14 @@
+syntax = "proto3";
+option java_package = "com.example.cupofcoffee.app.proto";
+option java_multiple_files = true;
+
+
+message UserSettings {
+  string selectedSubReddit = 1;
+  repeated SubReddit subReddits = 2;
+}
+
+
+message SubReddit {
+  string name = 1;
+}

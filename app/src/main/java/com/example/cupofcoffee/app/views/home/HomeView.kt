@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.cupofcoffee.Error.NetworkError
-import com.example.cupofcoffee.app.*
+import com.example.cupofcoffee.app.composables.*
 import com.example.cupofcoffee.app.data.models.ImageSource
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.models.PreviewImage
@@ -98,50 +98,51 @@ private fun HomeScreen(
 ) {
     val state by viewState.collectAsState()
     log?.d("HomeScreen new state: $state")
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        if (state.isLoading) {
-            Loading()
-        }
-        if (state.showLoadingError) {
-            LoadingError(NetworkError, onReload = onReloadPosts)
-        }
+    SideDrawer {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            if (state.isLoading) {
+                Loading()
+            }
+            if (state.showLoadingError) {
+                LoadingError(NetworkError, onReload = onReloadPosts)
+            }
 
-        if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
+            if (state.showEmptyPosts) EmptyPosts(onReload = onReloadPosts)
 
-        if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
-            state.posts.let {
-                Box {
-                    val listState = rememberLazyListState()
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(colors.background)
-                    ) {
-                        items(it) { post -> Post(post, onPostClicked) }
-                    }
+            if (!state.isLoading && !state.showLoadingError && !state.showEmptyPosts) {
+                state.posts.let {
+                    Box {
+                        val listState = rememberLazyListState()
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(colors.background)
+                        ) {
+                            items(it) { post -> Post(post, onPostClicked) }
+                        }
 
-                    LaunchedEffect(listState) {
-                        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
-                            .mapNotNull { it?.index }
-                            .distinctUntilChanged()
-                            .collect {
-                                if (it >= listState.layoutInfo.totalItemsCount - 1) {
-                                    onPageEndReached()
+                        LaunchedEffect(listState) {
+                            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
+                                .mapNotNull { it?.index }
+                                .distinctUntilChanged()
+                                .collect {
+                                    if (it >= listState.layoutInfo.totalItemsCount - 1) {
+                                        onPageEndReached()
+                                    }
                                 }
-                            }
-                    }
+                        }
 
-                    if (state.isPaginating) {
-                        PaginationIndicator(modifier = Modifier.align(BottomCenter))
-                        Spacer(modifier = Modifier.height(8.dp))
+                        if (state.isPaginating) {
+                            PaginationIndicator(modifier = Modifier.align(BottomCenter))
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
         }
-
     }
 }
 

@@ -12,4 +12,7 @@
     <string name="loading_comments">Loading comments...</string>
     <string name="label_down_votes">Down votes</string>
     <string name="label_up_votes">Up votes</string>
+    <string name="change_subreddit">Change sub reddit</string>
+    <string name="version"><![CDATA[Version : <version>]]></string>
+    <string name="version_placeholder"><![CDATA[<version>]]></string>
 </resources>

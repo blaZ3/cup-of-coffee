@@ -15,8 +15,8 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.cupofcoffee.Error.NetworkError
-import com.example.cupofcoffee.app.LoadingError
-import com.example.cupofcoffee.app.PostDetail
+import com.example.cupofcoffee.app.composables.LoadingError
+import com.example.cupofcoffee.app.composables.PostDetail
 import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.LoadPostAndComments

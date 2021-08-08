@@ -3,8 +3,8 @@ package com.example.cupofcoffee.views
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import com.example.cupofcoffee.app.Post
-import com.example.cupofcoffee.app.PostDetail
+import com.example.cupofcoffee.app.composables.Post
+import com.example.cupofcoffee.app.composables.PostDetail
 import com.example.cupofcoffee.app.views.detail.flatten
 import com.example.cupofcoffee.ui.theme.CupOfCoffeeTheme
 import com.example.cupofcoffee.utils.comments

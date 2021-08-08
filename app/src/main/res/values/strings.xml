@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cup of coffee</string>
+    <string name="app_name">Cup of coffee ☕️</string>
     <string name="title_activity_post_detail" translatable="false">PostDetailActivity</string>
     <string name="empty_posts">Empty posts</string>
     <string name="reload_posts">Reload posts</string>

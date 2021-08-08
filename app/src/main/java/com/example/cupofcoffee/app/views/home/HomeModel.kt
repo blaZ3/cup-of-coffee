@@ -1,7 +1,9 @@
 package com.example.cupofcoffee.app.views.home
 
 import com.example.cupofcoffee.app.data.models.Post
+import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.data.repository.PostRepository
+import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
 import com.example.cupofcoffee.app.views.home.HomeAction.*
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
@@ -12,8 +14,12 @@ import kotlinx.coroutines.flow.onEach
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
+
+private val DEFAULT_SUB_REDDIT = SubReddit("popular")
+
 internal class HomeModel @Inject constructor(
     private val postRepo: PostRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val log: Log
 ) {
     private lateinit var scope: ManagedCoroutineScope
@@ -32,7 +38,7 @@ internal class HomeModel @Inject constructor(
     private fun doAction(it: HomeAction) {
         log.d("doAction: $it")
         when (it) {
-            InitAction -> {
+            InitAction, UserSettingsChanged -> {
                 scope.launch {
                     currState = currState.copy(
                         isLoading = true,
@@ -40,7 +46,14 @@ internal class HomeModel @Inject constructor(
                         showEmptyPosts = false,
                         isPaginating = false
                     )
-                    internalViewState.emit(currState.copy(from = "InitAction"))
+                    internalViewState.emit(currState)
+
+                    val settings = userSettingsRepository.getUserSettings()
+
+                    currState = currState.copy(
+                        selectedSubreddit = settings.selectedSubReddit ?: DEFAULT_SUB_REDDIT,
+                        subReddits = settings.subReddits
+                    )
                     loadPosts()
                 }
             }
@@ -52,25 +65,36 @@ internal class HomeModel @Inject constructor(
                         showEmptyPosts = false,
                         isPaginating = false
                     )
-                    internalViewState.emit(currState.copy(from = "Reload"))
+                    internalViewState.emit(currState)
                     loadPosts()
                 }
             }
             is LoadMore -> {
                 scope.launch {
                     currState = currState.copy(isPaginating = true)
-                    internalViewState.emit(currState.copy(from = "LoadMore"))
+                    internalViewState.emit(currState)
+                    loadPosts()
                 }
-                loadPosts()
+            }
+            is SelectedSubRedditChanged -> {
+                scope.launch {
+                    currState = currState.copy(
+                        selectedSubreddit = it.subReddit,
+                        after = null,
+                        isLoading = true
+                    )
+                    internalViewState.emit(currState)
+                    loadPosts(reset = true)
+                }
             }
         }
     }
 
-    private fun loadPosts() {
+    private fun loadPosts(reset: Boolean = false) {
         log.d("loadPosts")
         scope.launch {
             val result = postRepo.getPosts(
-                currState.subreddit,
+                currState.selectedSubreddit.name,
                 currState.after
             )
             val resultPosts = result?.posts
@@ -80,6 +104,7 @@ internal class HomeModel @Inject constructor(
             )
             currState = if (resultPosts != null) {
                 val newPosts = currState.posts.toMutableList()
+                if (reset) newPosts.clear()
                 newPosts.addAll(resultPosts)
                 currState.copy(
                     posts = newPosts,
@@ -91,25 +116,27 @@ internal class HomeModel @Inject constructor(
                     showLoadingError = true
                 )
             }
-            internalViewState.emit(currState.copy(from = "loadPosts"))
+            internalViewState.emit(currState)
         }
     }
 
 }
 
 data class HomeViewState(
-    val subreddit: String = "popular",
+    val selectedSubreddit: SubReddit = DEFAULT_SUB_REDDIT,
+    val subReddits: List<SubReddit> = listOf(),
     val isLoading: Boolean = false,
     val showEmptyPosts: Boolean = false,
     val showLoadingError: Boolean = false,
     val isPaginating: Boolean = false,
     val posts: List<Post> = arrayListOf(),
-    val after: String? = null,
-    val from: String = ""
+    val after: String? = null
 )
 
 sealed class HomeAction {
     object InitAction : HomeAction()
+    object UserSettingsChanged : HomeAction()
     data class Reload(val timestamp: Long = currentTimeMillis()) : HomeAction()
     data class LoadMore(val timestamp: Long = currentTimeMillis()) : HomeAction()
+    data class SelectedSubRedditChanged(val subReddit: SubReddit) : HomeAction()
 }

@@ -1,7 +1,11 @@
 package com.example.cupofcoffee
 
+import android.content.Context
 import androidx.annotation.VisibleForTesting
+import androidx.datastore.core.DataStore
 import com.example.cupofcoffee.app.data.network.RedditApi
+import com.example.cupofcoffee.app.proto.UserSettings
+import com.example.cupofcoffee.app.data.store.usersettings.userSettingsDataStore
 import com.example.cupofcoffee.helpers.json.ApiResultEmptyStringToNullAdapter
 import com.example.cupofcoffee.helpers.log.AndroidLog
 import com.example.cupofcoffee.helpers.log.Log
@@ -10,6 +14,7 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers.IO
@@ -70,6 +75,11 @@ object HelperModule {
         return Main
     }
 
+    @Provides
+    @UserSettingsDS
+    fun providesUserSettingsDataStore(@ApplicationContext context: Context): DataStore<UserSettings> {
+        return context.userSettingsDataStore
+    }
 }
 
 @VisibleForTesting

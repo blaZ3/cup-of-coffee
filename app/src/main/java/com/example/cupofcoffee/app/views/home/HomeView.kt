@@ -24,8 +24,8 @@ import com.example.cupofcoffee.app.composables.*
 import com.example.cupofcoffee.app.data.models.ImageSource
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.models.PreviewImage
-import com.example.cupofcoffee.app.views.home.HomeAction.LoadMore
-import com.example.cupofcoffee.app.views.home.HomeAction.Reload
+import com.example.cupofcoffee.app.data.models.SubReddit
+import com.example.cupofcoffee.app.views.home.HomeAction.*
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.helpers.navigation.Navigator
@@ -70,11 +70,17 @@ class HomeView(
                     scope.launch { model.actions.emit(Reload()) }
                 },
                 onPageEndReached = {
-                    log.d("onPageEndReached")
                     scope.launch { model.actions.emit(LoadMore()) }
                 },
                 onPostClicked = {
                     navigator.navigateToPostDetail(it)
+                },
+                onChangeSubReddit = {
+                    log.d("onChangeSubReddit")
+                    scope.launch { model.actions.emit(SelectedSubRedditChanged(it)) }
+                },
+                onAddNewSubReddit = {
+                    log.d("onAddNewSubReddit")
                 }
             )
         }
@@ -94,11 +100,18 @@ private fun HomeScreen(
     log: Log? = null,
     onReloadPosts: () -> Unit,
     onPageEndReached: () -> Unit,
-    onPostClicked: (post: Post) -> Unit
+    onPostClicked: (post: Post) -> Unit,
+    onChangeSubReddit: (subReddit: SubReddit) -> Unit,
+    onAddNewSubReddit: () -> Unit,
 ) {
     val state by viewState.collectAsState()
     log?.d("HomeScreen new state: $state")
-    SideDrawer {
+    SideDrawer(
+        selectedSubReddit = state.selectedSubreddit,
+        subReddits = state.subReddits,
+        onChangeSubReddit = onChangeSubReddit,
+        onAddNewSubReddit = onAddNewSubReddit
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -205,7 +218,9 @@ private fun HomeComposePreview() {
             viewState = state,
             onReloadPosts = {},
             onPageEndReached = {},
-            onPostClicked = {}
+            onPostClicked = {},
+            onChangeSubReddit = {},
+            onAddNewSubReddit = {}
         )
     }
 }
@@ -271,7 +286,9 @@ private fun HomeComposePreviewLight() {
             viewState = state,
             onReloadPosts = {},
             onPageEndReached = {},
-            onPostClicked = {}
+            onPostClicked = {},
+            onChangeSubReddit = {},
+            onAddNewSubReddit = {}
         )
     }
 }

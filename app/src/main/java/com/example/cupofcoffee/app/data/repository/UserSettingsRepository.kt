@@ -1,9 +1,15 @@
 package com.example.cupofcoffee.app.data.repository
 
-import com.example.cupofcoffee.app.data.store.usersettings.UserDataStore
+import com.example.cupofcoffee.app.data.models.UserSettings
+import com.example.cupofcoffee.app.data.store.usersettings.UserSettingsDataStore
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(
-    private val userDataStore: UserDataStore
+class UserSettingsRepository @Inject constructor(
+    private val userSettingsDataStore: UserSettingsDataStore
 ) {
+
+    suspend fun getUserSettings(): UserSettings {
+        return userSettingsDataStore.getUserSettings()
+    }
+
 }

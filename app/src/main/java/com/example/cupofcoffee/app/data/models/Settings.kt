@@ -2,7 +2,7 @@ package com.example.cupofcoffee.app.data.models
 
 
 data class UserSettings(
-    val selectedSubReddit: String,
+    val selectedSubReddit: SubReddit? = null,
     val subReddits: List<SubReddit>
 )
 

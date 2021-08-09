@@ -1,15 +1,42 @@
 package com.example.cupofcoffee.app.data.repository
 
-import com.example.cupofcoffee.app.data.models.UserSettings
+import com.example.cupofcoffee.app.data.models.POPULAR_SUB_REDDIT
+import com.example.cupofcoffee.app.data.models.SubReddit
+import com.example.cupofcoffee.app.data.models.defaultSubs
 import com.example.cupofcoffee.app.data.store.usersettings.UserSettingsDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class UserSettingsRepository @Inject constructor(
     private val userSettingsDataStore: UserSettingsDataStore
 ) {
 
-    suspend fun getUserSettings(): UserSettings {
-        return userSettingsDataStore.getUserSettings()
+    fun getUserSelectedSubReddit(): Flow<SubReddit> = flow {
+        userSettingsDataStore.getSelectedSubReddit()
+            .collect {
+                if (it.name.isEmpty()) emit(POPULAR_SUB_REDDIT) else emit(it)
+            }
     }
 
+    fun getUserSubReddits(): Flow<List<SubReddit>> = flow {
+        userSettingsDataStore.getSubReddits()
+            .collect {
+                if (it.isNullOrEmpty()) {
+                    emit(defaultSubs)
+                } else {
+                    emit(it.apply { defaultSubs + it.toMutableList() })
+                }
+            }
+    }
+
+    suspend fun changeSelectedSubReddit(subReddit: SubReddit) {
+        userSettingsDataStore.updateSelectedSubreddit(subReddit)
+    }
+
+
+    suspend fun updateSubReddits(newList: List<SubReddit>) {
+        userSettingsDataStore.updateListOfSubReddits(newList)
+    }
 }

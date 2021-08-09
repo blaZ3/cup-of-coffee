@@ -72,7 +72,8 @@ class HomeView(
                 onChangeSubReddit = { scope.launch { model.actions.emit(SelectedSubRedditChanged(it)) } },
                 onAddNewSubReddit = { scope.launch { model.actions.emit(ShowAddSubReddit) } },
                 onAddSubRedditDialogDismiss = { scope.launch { model.actions.emit(HideAddSubReddit) } },
-                onSubRedditAdded = { scope.launch { model.actions.emit(AddSubRedditToList(it)) } }
+                onSubRedditAdded = { scope.launch { model.actions.emit(AddSubRedditToList(it)) } },
+                onRemoveSubReddit = { scope.launch { model.actions.emit(RemoveSubRedditFromList(it)) } },
             )
         }
     }
@@ -95,7 +96,8 @@ private fun HomeScreen(
     onChangeSubReddit: (subReddit: SubReddit) -> Unit,
     onAddNewSubReddit: () -> Unit,
     onAddSubRedditDialogDismiss: () -> Unit,
-    onSubRedditAdded: (subReddit: String) -> Unit
+    onSubRedditAdded: (subReddit: String) -> Unit,
+    onRemoveSubReddit: (subReddit: String) -> Unit,
 ) {
     val state by viewState.collectAsState()
     log?.d("HomeScreen new state: $state")
@@ -103,7 +105,8 @@ private fun HomeScreen(
         selectedSubReddit = state.selectedSubreddit,
         subReddits = state.subReddits,
         onChangeSubReddit = onChangeSubReddit,
-        onAddNewSubReddit = onAddNewSubReddit
+        onAddNewSubReddit = onAddNewSubReddit,
+        onRemoveSubReddit = onRemoveSubReddit,
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -222,7 +225,8 @@ private fun HomeComposePreview() {
             onChangeSubReddit = {},
             onAddNewSubReddit = {},
             onAddSubRedditDialogDismiss = {},
-            onSubRedditAdded = {}
+            onSubRedditAdded = {},
+            onRemoveSubReddit = {},
         )
     }
 }
@@ -292,7 +296,8 @@ private fun HomeComposePreviewLight() {
             onChangeSubReddit = {},
             onAddNewSubReddit = {},
             onAddSubRedditDialogDismiss = {},
-            onSubRedditAdded = {}
+            onSubRedditAdded = {},
+            onRemoveSubReddit = {},
         )
     }
 }

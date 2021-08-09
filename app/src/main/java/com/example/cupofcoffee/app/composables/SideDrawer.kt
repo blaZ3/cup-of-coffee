@@ -2,7 +2,6 @@ package com.example.cupofcoffee.app.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -12,16 +11,18 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cupofcoffee.BuildConfig.VERSION_NAME
+import com.example.cupofcoffee.R.drawable.ic_remove
 import com.example.cupofcoffee.R.string.*
 import com.example.cupofcoffee.app.data.models.SubReddit
+import com.example.cupofcoffee.app.data.models.defaultSubNames
 import kotlinx.coroutines.launch
 
 
@@ -32,6 +33,7 @@ fun SideDrawer(
     startState: DrawerValue = Closed,
     onChangeSubReddit: (subReddit: SubReddit) -> Unit,
     onAddNewSubReddit: () -> Unit,
+    onRemoveSubReddit: (subRedditName: String) -> Unit,
     content: @Composable () -> Unit
 ) {
     val drawerState = rememberDrawerState(startState)
@@ -41,54 +43,69 @@ fun SideDrawer(
         drawerContent = {
             LazyColumn(content = {
                 item {
-                    Text(
-                        modifier = Modifier.padding(4.dp),
-                        text = stringResource(change_subreddit),
-                        style = typography.h5
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Divider(modifier = Modifier.height(4.dp))
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                items(subReddits) { subReddit ->
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(true) {
-                                scope.launch {
-                                    drawerState.close()
-                                    onChangeSubReddit(subReddit)
-                                }
-                            },
-                        style = typography.h6,
-                        textAlign = TextAlign.Center,
-                        color = if (subReddit.name == selectedSubReddit.name)
-                            colors.primary else colors.secondary,
-                        text = "r/${subReddit.name}",
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                item {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = CenterHorizontally
-                    ) {
-                        Divider(modifier = Modifier.height(4.dp))
-                        Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = CenterVertically) {
+                        Text(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .weight(0.75f),
+                            text = stringResource(change_subreddit),
+                            style = typography.h5
+                        )
                         Button(
+                            modifier = Modifier
+                                .weight(0.25f)
+                                .padding(4.dp),
                             onClick = {
                                 scope.launch {
                                     drawerState.close()
                                     onAddNewSubReddit()
                                 }
                             }) {
-                            Text(text = stringResource(add_new))
+                            Text(text = stringResource(add))
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Divider(modifier = Modifier.height(4.dp))
                     }
-
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Divider(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
+
+                items(subReddits) { subReddit ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            modifier = Modifier
+                                .weight(0.9f)
+                                .clickable(true) {
+                                    scope.launch {
+                                        drawerState.close()
+                                        onChangeSubReddit(subReddit)
+                                    }
+                                },
+                            style = typography.h6,
+                            textAlign = TextAlign.Center,
+                            color = if (subReddit.name == selectedSubReddit.name)
+                                colors.primary else colors.secondary,
+                            text = "r/${subReddit.name}",
+                        )
+                        Row(modifier = Modifier.weight(0.1f)) {
+                            if (!defaultSubNames.contains(subReddit.name)) {
+                                Icon(
+                                    modifier = Modifier.clickable(true) {
+                                        scope.launch {
+                                            drawerState.close()
+                                            onRemoveSubReddit(subReddit.name)
+                                        }
+                                    },
+                                    painter = painterResource(id = ic_remove),
+                                    contentDescription = stringResource(remove_subreddit)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider()
+                }
+
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -120,6 +137,9 @@ fun SideDrawerPreview() {
 
         },
         onAddNewSubReddit = {
+
+        },
+        onRemoveSubReddit = {
 
         },
     ) {

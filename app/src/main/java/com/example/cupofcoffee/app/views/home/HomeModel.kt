@@ -1,9 +1,6 @@
 package com.example.cupofcoffee.app.views.home
 
-import com.example.cupofcoffee.app.data.models.DEFAULT_SUB_REDDIT
-import com.example.cupofcoffee.app.data.models.Post
-import com.example.cupofcoffee.app.data.models.SubReddit
-import com.example.cupofcoffee.app.data.models.defaultSubNames
+import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
 import com.example.cupofcoffee.app.views.home.HomeAction.*
@@ -41,17 +38,34 @@ internal class HomeModel @Inject constructor(
                 ShowAddSubReddit -> doShowAddSubReddit()
                 HideAddSubReddit -> doHideSubReddit()
                 is AddSubRedditToList -> doAddSubReddit(it.subRedditName)
+                is RemoveSubRedditFromList -> doRemoveSubReddit(it.subRedditName)
             }
         }.launchIn(this.scope)
     }
 
-    private fun doAddSubReddit(name: String) {
+    private fun doRemoveSubReddit(name: String) {
         scope.launch {
             val newList = currState.subReddits
-                .filterNot { defaultSubNames.contains(it.name) }
+                .filterNot { it.name == name || defaultSubNames.contains(it.name) }
                 .toMutableList()
-                .also { it.add(SubReddit(name.toSubRedditName())) }
             userSettingsRepository.updateSubReddits(newList)
+            userSettingsRepository.changeSelectedSubReddit(
+                if (newList.isNotEmpty()) newList.last() else defaultSubs.last()
+            )
+            currState = currState.copy(showAddSubReddit = false)
+            internalViewState.emit(currState)
+        }
+    }
+
+    private fun doAddSubReddit(name: String) {
+        scope.launch {
+            val subReddit = SubReddit(name.toSubRedditName())
+            val newList = currState.subReddits
+                .toMutableList()
+                .also { it.add(subReddit) }
+                .filterNot { defaultSubNames.contains(it.name) }
+            userSettingsRepository.updateSubReddits(newList)
+            userSettingsRepository.changeSelectedSubReddit(subReddit)
             currState = currState.copy(showAddSubReddit = false)
             internalViewState.emit(currState)
         }
@@ -192,5 +206,6 @@ sealed class HomeAction {
     object ShowAddSubReddit : HomeAction()
     object HideAddSubReddit : HomeAction()
     data class AddSubRedditToList(val subRedditName: String) : HomeAction()
+    data class RemoveSubRedditFromList(val subRedditName: String) : HomeAction()
 
 }

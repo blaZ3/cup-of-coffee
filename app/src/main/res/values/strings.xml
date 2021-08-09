@@ -19,4 +19,5 @@
     <string name="add_new_sub">Add new subreddit</string>
     <string name="add_sub_placeholder">Enter the name of the sub reddit you want to add.</string>
     <string name="add">Add</string>
+    <string name="remove_subreddit">Remove subreddit</string>
 </resources>

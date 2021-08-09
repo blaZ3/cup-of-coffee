@@ -3,12 +3,14 @@ package com.example.cupofcoffee.app.views.home
 import com.example.cupofcoffee.app.data.models.DEFAULT_SUB_REDDIT
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.models.SubReddit
+import com.example.cupofcoffee.app.data.models.defaultSubNames
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
 import com.example.cupofcoffee.app.views.home.HomeAction.*
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import kotlinx.coroutines.flow.*
+import toSubRedditName
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
@@ -28,16 +30,44 @@ internal class HomeModel @Inject constructor(
 
     fun init(lifecycleCoroutineScope: ManagedCoroutineScope) {
         this.scope = lifecycleCoroutineScope
-        actions.onEach { doAction(it) }.launchIn(lifecycleCoroutineScope)
+        actions.onEach {
+            log.d("doAction: $it")
+            when (it) {
+                InitAction,
+                UserSettingsChanged -> doInitAction()
+                is Reload -> doReload()
+                is LoadMore -> doLoadMore()
+                is SelectedSubRedditChanged -> doChangeSelectedSubReddit(it.subReddit)
+                ShowAddSubReddit -> doShowAddSubReddit()
+                HideAddSubReddit -> doHideSubReddit()
+                is AddSubRedditToList -> doAddSubReddit(it.subRedditName)
+            }
+        }.launchIn(this.scope)
     }
 
-    private fun doAction(it: HomeAction) {
-        log.d("doAction: $it")
-        when (it) {
-            InitAction, UserSettingsChanged -> doInitAction()
-            is Reload -> doReload()
-            is LoadMore -> doLoadMore()
-            is SelectedSubRedditChanged -> doChangeSelectedSubReddit(it.subReddit)
+    private fun doAddSubReddit(name: String) {
+        scope.launch {
+            val newList = currState.subReddits
+                .filterNot { defaultSubNames.contains(it.name) }
+                .toMutableList()
+                .also { it.add(SubReddit(name.toSubRedditName())) }
+            userSettingsRepository.updateSubReddits(newList)
+            currState = currState.copy(showAddSubReddit = false)
+            internalViewState.emit(currState)
+        }
+    }
+
+    private fun doHideSubReddit() {
+        scope.launch {
+            currState = currState.copy(showAddSubReddit = false)
+            internalViewState.emit(currState)
+        }
+    }
+
+    private fun doShowAddSubReddit() {
+        scope.launch {
+            currState = currState.copy(showAddSubReddit = true)
+            internalViewState.emit(currState)
         }
     }
 
@@ -136,18 +166,19 @@ internal class HomeModel @Inject constructor(
             internalViewState.emit(currState)
         }
     }
-
 }
 
 data class HomeViewState(
     val selectedSubreddit: SubReddit = DEFAULT_SUB_REDDIT,
     val subReddits: List<SubReddit> = listOf(),
+    val posts: List<Post> = arrayListOf(),
+    val after: String? = null,
+
     val isLoading: Boolean = false,
     val showEmptyPosts: Boolean = false,
     val showLoadingError: Boolean = false,
     val isPaginating: Boolean = false,
-    val posts: List<Post> = arrayListOf(),
-    val after: String? = null
+    val showAddSubReddit: Boolean = false,
 )
 
 sealed class HomeAction {
@@ -155,5 +186,11 @@ sealed class HomeAction {
     object UserSettingsChanged : HomeAction()
     data class Reload(val timestamp: Long = currentTimeMillis()) : HomeAction()
     data class LoadMore(val timestamp: Long = currentTimeMillis()) : HomeAction()
+
     data class SelectedSubRedditChanged(val subReddit: SubReddit) : HomeAction()
+
+    object ShowAddSubReddit : HomeAction()
+    object HideAddSubReddit : HomeAction()
+    data class AddSubRedditToList(val subRedditName: String) : HomeAction()
+
 }

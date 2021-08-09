@@ -1,10 +1,14 @@
 package com.example.cupofcoffee.app.views.home
 
-import com.example.cupofcoffee.app.data.models.*
+import com.example.cupofcoffee.app.data.models.ApiResult
+import com.example.cupofcoffee.app.data.models.Data
+import com.example.cupofcoffee.app.data.models.DataChild
+import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.models.ResultType.Listing
 import com.example.cupofcoffee.app.data.network.RedditApi
 import com.example.cupofcoffee.app.data.network.RedditService
 import com.example.cupofcoffee.app.data.repository.PostRepository
+import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
 import com.example.cupofcoffee.helpers.coroutine.TestManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.google.common.truth.Truth.assertThat
@@ -28,9 +32,10 @@ class HomeModelTests {
 
     private val api = mock<RedditApi>()
     private val postRepository = PostRepository(RedditService(api = api), log = mock())
+    private val userSettingsRepository = UserSettingsRepository()
     private val log = mock<Log>()
 
-    private val model = HomeModel(postRepository, log)
+    private val model = HomeModel(postRepository, userSettingsRepository, log)
 
     private val scope = TestManagedCoroutineScope(TestCoroutineScope())
 

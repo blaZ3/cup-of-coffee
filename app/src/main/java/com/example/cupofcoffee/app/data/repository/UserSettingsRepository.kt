@@ -26,7 +26,9 @@ class UserSettingsRepository @Inject constructor(
                 if (it.isNullOrEmpty()) {
                     emit(defaultSubs)
                 } else {
-                    emit(it.apply { defaultSubs + it.toMutableList() })
+                    emit(defaultSubs.toMutableList().also { mutableList ->
+                        mutableList.addAll(it)
+                    })
                 }
             }
     }

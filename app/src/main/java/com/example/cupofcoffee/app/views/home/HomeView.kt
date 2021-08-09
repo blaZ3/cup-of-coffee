@@ -66,22 +66,13 @@ class HomeView(
     override fun Content() {
         CupOfCoffeeTheme {
             HomeScreen(model.viewState, log,
-                onReloadPosts = {
-                    scope.launch { model.actions.emit(Reload()) }
-                },
-                onPageEndReached = {
-                    scope.launch { model.actions.emit(LoadMore()) }
-                },
-                onPostClicked = {
-                    navigator.navigateToPostDetail(it)
-                },
-                onChangeSubReddit = {
-                    log.d("onChangeSubReddit")
-                    scope.launch { model.actions.emit(SelectedSubRedditChanged(it)) }
-                },
-                onAddNewSubReddit = {
-                    log.d("onAddNewSubReddit")
-                }
+                onReloadPosts = { scope.launch { model.actions.emit(Reload()) } },
+                onPageEndReached = { scope.launch { model.actions.emit(LoadMore()) } },
+                onPostClicked = { navigator.navigateToPostDetail(it) },
+                onChangeSubReddit = { scope.launch { model.actions.emit(SelectedSubRedditChanged(it)) } },
+                onAddNewSubReddit = { scope.launch { model.actions.emit(ShowAddSubReddit) } },
+                onAddSubRedditDialogDismiss = { scope.launch { model.actions.emit(HideAddSubReddit) } },
+                onSubRedditAdded = { scope.launch { model.actions.emit(AddSubRedditToList(it)) } }
             )
         }
     }
@@ -103,6 +94,8 @@ private fun HomeScreen(
     onPostClicked: (post: Post) -> Unit,
     onChangeSubReddit: (subReddit: SubReddit) -> Unit,
     onAddNewSubReddit: () -> Unit,
+    onAddSubRedditDialogDismiss: () -> Unit,
+    onSubRedditAdded: (subReddit: String) -> Unit
 ) {
     val state by viewState.collectAsState()
     log?.d("HomeScreen new state: $state")
@@ -151,6 +144,13 @@ private fun HomeScreen(
                         if (state.isPaginating) {
                             PaginationIndicator(modifier = Modifier.align(BottomCenter))
                             Spacer(modifier = Modifier.height(8.dp))
+                        }
+
+                        if (state.showAddSubReddit) {
+                            AddSubRedditDialog(
+                                onDismissRequest = onAddSubRedditDialogDismiss,
+                                onSubRedditAdded = onSubRedditAdded
+                            )
                         }
                     }
                 }
@@ -220,7 +220,9 @@ private fun HomeComposePreview() {
             onPageEndReached = {},
             onPostClicked = {},
             onChangeSubReddit = {},
-            onAddNewSubReddit = {}
+            onAddNewSubReddit = {},
+            onAddSubRedditDialogDismiss = {},
+            onSubRedditAdded = {}
         )
     }
 }
@@ -288,7 +290,9 @@ private fun HomeComposePreviewLight() {
             onPageEndReached = {},
             onPostClicked = {},
             onChangeSubReddit = {},
-            onAddNewSubReddit = {}
+            onAddNewSubReddit = {},
+            onAddSubRedditDialogDismiss = {},
+            onSubRedditAdded = {}
         )
     }
 }

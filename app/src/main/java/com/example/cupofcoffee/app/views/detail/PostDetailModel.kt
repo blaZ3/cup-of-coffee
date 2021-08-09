@@ -1,9 +1,9 @@
 package com.example.cupofcoffee.app.views.detail
 
+import asShortName
 import com.example.cupofcoffee.IODispatcher
 import com.example.cupofcoffee.app.data.models.Comment
 import com.example.cupofcoffee.app.data.models.Post
-import com.example.cupofcoffee.app.data.models.asShortName
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.InitAction
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.LoadPostAndComments

@@ -2,7 +2,6 @@ package com.example.cupofcoffee.helpers.navigation
 
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cupofcoffee.app.data.models.Post
-import com.example.cupofcoffee.app.data.models.asShortName
 import com.example.cupofcoffee.app.views.detail.PostDetailActivity
 
 interface Navigator {

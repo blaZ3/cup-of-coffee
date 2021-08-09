@@ -19,3 +19,6 @@ val MEMES_SUB_REDDIT = SubReddit("memes")
 val defaultSubs = listOf(
     POPULAR_SUB_REDDIT, PICS_SUB_REDDIT, NEWS_SUB_REDDIT, MEMES_SUB_REDDIT
 )
+
+
+val defaultSubNames = defaultSubs.map { it.name }

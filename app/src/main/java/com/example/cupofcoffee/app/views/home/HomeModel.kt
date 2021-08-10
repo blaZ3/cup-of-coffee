@@ -4,6 +4,8 @@ import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
 import com.example.cupofcoffee.app.views.home.HomeAction.*
+import com.example.cupofcoffee.base.Action
+import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import kotlinx.coroutines.flow.*
@@ -115,14 +117,6 @@ internal class HomeModel @Inject constructor(
 
     private fun doInitAction() {
         scope.launch {
-            currState = currState.copy(
-                isLoading = true,
-                showLoadingError = false,
-                showEmptyPosts = false,
-                isPaginating = false
-            )
-            internalViewState.emit(currState)
-
             scope.launch {
                 userSettingsRepository.getUserSelectedSubReddit()
                     .collect {
@@ -130,6 +124,12 @@ internal class HomeModel @Inject constructor(
                             selectedSubreddit = it,
                             after = null,
                             isLoading = true
+                        )
+                        currState = currState.copy(
+                            isLoading = true,
+                            showLoadingError = false,
+                            showEmptyPosts = false,
+                            isPaginating = false
                         )
                         internalViewState.emit(currState)
                         loadPosts(reset = true)
@@ -182,6 +182,7 @@ internal class HomeModel @Inject constructor(
     }
 }
 
+
 data class HomeViewState(
     val selectedSubreddit: SubReddit = DEFAULT_SUB_REDDIT,
     val subReddits: List<SubReddit> = listOf(),
@@ -193,9 +194,9 @@ data class HomeViewState(
     val showLoadingError: Boolean = false,
     val isPaginating: Boolean = false,
     val showAddSubReddit: Boolean = false,
-)
+) : ViewState()
 
-sealed class HomeAction {
+sealed class HomeAction : Action() {
     object InitAction : HomeAction()
     object UserSettingsChanged : HomeAction()
     data class Reload(val timestamp: Long = currentTimeMillis()) : HomeAction()
@@ -207,5 +208,4 @@ sealed class HomeAction {
     object HideAddSubReddit : HomeAction()
     data class AddSubRedditToList(val subRedditName: String) : HomeAction()
     data class RemoveSubRedditFromList(val subRedditName: String) : HomeAction()
-
 }

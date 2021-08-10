@@ -3,6 +3,7 @@ package com.example.cupofcoffee.app.data.repository
 import com.example.cupofcoffee.app.data.models.POPULAR_SUB_REDDIT
 import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.data.models.defaultSubs
+import com.example.cupofcoffee.app.data.store.usersettings.AppUserSettingsDataStore
 import com.example.cupofcoffee.app.data.store.usersettings.UserSettingsDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect

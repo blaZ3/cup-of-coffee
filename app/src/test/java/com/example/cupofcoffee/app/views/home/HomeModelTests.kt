@@ -1,18 +1,18 @@
 package com.example.cupofcoffee.app.views.home
 
-import com.example.cupofcoffee.app.data.models.ApiResult
-import com.example.cupofcoffee.app.data.models.Data
-import com.example.cupofcoffee.app.data.models.DataChild
-import com.example.cupofcoffee.app.data.models.Post
+import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.models.ResultType.Listing
 import com.example.cupofcoffee.app.data.network.RedditApi
 import com.example.cupofcoffee.app.data.network.RedditService
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
+import com.example.cupofcoffee.app.data.store.usersettings.UserSettingsDataStore
 import com.example.cupofcoffee.helpers.coroutine.TestManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
+import com.example.cupofcoffee.helpers.start
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -32,7 +32,8 @@ class HomeModelTests {
 
     private val api = mock<RedditApi>()
     private val postRepository = PostRepository(RedditService(api = api), log = mock())
-    private val userSettingsRepository = UserSettingsRepository()
+    private val userSettingsDataStore = mock<UserSettingsDataStore>()
+    private val userSettingsRepository = UserSettingsRepository(userSettingsDataStore)
     private val log = mock<Log>()
 
     private val model = HomeModel(postRepository, userSettingsRepository, log)
@@ -56,18 +57,21 @@ class HomeModelTests {
     @Test
     fun `test home model emits correct view state for success`() = runBlockingTest {
         whenever(api.getPosts(any(), anyOrNull())).thenReturn(success(result))
+
+        val selectedSubRedditFlow = MutableStateFlow(SubReddit("test"))
+        whenever(userSettingsDataStore.getSelectedSubReddit()).thenReturn(selectedSubRedditFlow)
+
         val viewStates = mutableListOf<HomeViewState>()
         val job = launch { model.viewState.toList(viewStates) }
 
         model.init(scope)
 
-        assertThat(viewStates.size).isEqualTo(3)
-        assertThat(viewStates[0].isLoading).isEqualTo(false)
-        assertThat(viewStates[1].isLoading).isEqualTo(true)
-        assertThat(viewStates[2].isLoading).isEqualTo(false)
-        assertThat(viewStates[2].showLoadingError).isEqualTo(false)
-        assertThat(viewStates[2].showEmptyPosts).isEqualTo(false)
-        assertThat(viewStates[2].posts).isNotEmpty()
+        assertThat(viewStates.start().isLoading).isEqualTo(true)
+
+        assertThat(viewStates.last().isLoading).isEqualTo(false)
+        assertThat(viewStates.last().showLoadingError).isEqualTo(false)
+        assertThat(viewStates.last().showEmptyPosts).isEqualTo(false)
+        assertThat(viewStates.last().posts).isNotEmpty()
         job.cancel()
     }
 
@@ -76,13 +80,18 @@ class HomeModelTests {
         whenever(api.getPosts(any(), anyOrNull())).thenReturn(
             error(400, "{}".toResponseBody("application/json".toMediaType()))
         )
+
+        val selectedSubRedditFlow = MutableStateFlow(SubReddit("test"))
+        whenever(userSettingsDataStore.getSelectedSubReddit()).thenReturn(selectedSubRedditFlow)
+
         val viewStates = mutableListOf<HomeViewState>()
         val job = launch { model.viewState.toList(viewStates) }
 
         model.init(scope)
 
         assertThat(viewStates.size).isEqualTo(3)
-        assertThat(viewStates[2].showLoadingError).isEqualTo(true)
+        assertThat(viewStates.start().isLoading).isEqualTo(true)
+        assertThat(viewStates.last().showLoadingError).isEqualTo(true)
         job.cancel()
     }
 

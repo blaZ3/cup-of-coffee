@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataStore
 import com.example.cupofcoffee.app.data.network.RedditApi
-import com.example.cupofcoffee.app.proto.UserSettings
+import com.example.cupofcoffee.app.data.store.usersettings.AppUserSettingsDataStore
+import com.example.cupofcoffee.app.data.store.usersettings.UserSettingsDataStore
 import com.example.cupofcoffee.app.data.store.usersettings.userSettingsDataStore
+import com.example.cupofcoffee.app.proto.UserSettings
 import com.example.cupofcoffee.helpers.json.ApiResultEmptyStringToNullAdapter
 import com.example.cupofcoffee.helpers.log.AndroidLog
 import com.example.cupofcoffee.helpers.log.Log
@@ -80,6 +82,17 @@ object HelperModule {
     fun providesUserSettingsDataStore(@ApplicationContext context: Context): DataStore<UserSettings> {
         return context.userSettingsDataStore
     }
+}
+
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataStoreModule {
+    @Provides
+    fun providesUserSettingsDataStore(@UserSettingsDS dataStore: DataStore<UserSettings>): UserSettingsDataStore {
+        return AppUserSettingsDataStore(dataStore)
+    }
+
 }
 
 @VisibleForTesting

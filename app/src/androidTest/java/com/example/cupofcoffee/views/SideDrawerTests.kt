@@ -1,9 +1,13 @@
 package com.example.cupofcoffee.views
 
-import androidx.compose.material.DrawerValue
+import androidx.compose.material.DrawerValue.Open
 import androidx.compose.material.Text
-import androidx.compose.ui.test.*
+import androidx.compose.material.rememberDrawerState
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import com.example.cupofcoffee.app.composables.SideDrawer
 import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.data.models.defaultSubs
@@ -25,7 +29,7 @@ class SideDrawerTests {
     fun testSubsAreShown() {
         composeTestRule.setContent {
             SideDrawer(
-                startState = DrawerValue.Open,
+                drawerState = rememberDrawerState(initialValue = Open),
                 selectedSubReddit = subs.first(),
                 subReddits = subs,
                 onChangeSubReddit = {},
@@ -47,7 +51,7 @@ class SideDrawerTests {
     fun testRemoveSubIconIsShowForAllNonDefaultSubs() {
         composeTestRule.setContent {
             SideDrawer(
-                startState = DrawerValue.Open,
+                drawerState = rememberDrawerState(initialValue = Open),
                 selectedSubReddit = subs.first(),
                 subReddits = defaultSubs.toMutableList().also { it.addAll(subs) },
                 onChangeSubReddit = {},

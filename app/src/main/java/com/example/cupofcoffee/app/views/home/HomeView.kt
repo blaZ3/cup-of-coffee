@@ -9,17 +9,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.*
+import androidx.compose.material.DrawerValue.Closed
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.cupofcoffee.Error.NetworkError
+import com.example.cupofcoffee.R.drawable.ic_menu
+import com.example.cupofcoffee.R.string.app_name
+import com.example.cupofcoffee.R.string.desc_open_menu
 import com.example.cupofcoffee.app.composables.*
 import com.example.cupofcoffee.app.data.models.ImageSource
 import com.example.cupofcoffee.app.data.models.Post
@@ -101,7 +108,10 @@ private fun HomeScreen(
 ) {
     val state by viewState.collectAsState()
     log?.d("HomeScreen new state: $state")
+    val drawerState = rememberDrawerState(Closed)
+    val scope = rememberCoroutineScope()
     SideDrawer(
+        drawerState = drawerState,
         selectedSubReddit = state.selectedSubreddit,
         subReddits = state.subReddits,
         onChangeSubReddit = onChangeSubReddit,
@@ -111,6 +121,19 @@ private fun HomeScreen(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
+            TopAppBar(
+                title = { Text(text = stringResource(id = app_name)) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        scope.launch { drawerState.open() }
+                    }) {
+                        Icon(
+                            painter = painterResource(id = ic_menu),
+                            contentDescription = stringResource(desc_open_menu)
+                        )
+                    }
+                }
+            )
             if (state.isLoading) {
                 Loading()
             }

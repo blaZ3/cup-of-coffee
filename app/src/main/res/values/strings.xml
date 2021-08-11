@@ -20,4 +20,5 @@
     <string name="add_sub_placeholder">Enter the name of the sub reddit you want to add.</string>
     <string name="add">Add</string>
     <string name="remove_subreddit">Remove subreddit</string>
+    <string name="desc_open_menu">Open menu drawer</string>
 </resources>

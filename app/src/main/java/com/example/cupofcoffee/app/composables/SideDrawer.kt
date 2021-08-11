@@ -32,13 +32,12 @@ import kotlinx.coroutines.launch
 fun SideDrawer(
     selectedSubReddit: SubReddit,
     subReddits: List<SubReddit>,
-    startState: DrawerValue = Closed,
+    drawerState: DrawerState,
     onChangeSubReddit: (subReddit: SubReddit) -> Unit,
     onAddNewSubReddit: () -> Unit,
     onRemoveSubReddit: (subRedditName: String) -> Unit,
     content: @Composable () -> Unit
 ) {
-    val drawerState = rememberDrawerState(startState)
     val scope = rememberCoroutineScope()
     ModalDrawer(
         drawerState = drawerState,
@@ -138,7 +137,7 @@ fun SideDrawerPreview() {
             SubReddit("videos"),
             SubReddit("pics"),
         ),
-        startState = Open,
+        rememberDrawerState(initialValue = Open),
         onChangeSubReddit = {
 
         },

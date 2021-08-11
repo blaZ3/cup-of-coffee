@@ -6,8 +6,10 @@ import com.example.cupofcoffee.app.data.models.Comment
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.InitAction
-import com.example.cupofcoffee.app.views.detail.PostDetailAction.LoadPostAndComments
+import com.example.cupofcoffee.app.views.detail.PostDetailAction.ReLoadPostAndComments
+import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
+import com.example.cupofcoffee.helpers.log.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,67 +20,75 @@ import javax.inject.Inject
 
 internal class PostDetailModel @Inject constructor(
     private val postRepository: PostRepository,
-    @IODispatcher private val ioDispatcher: CoroutineDispatcher
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val log: Log,
 ) {
-
     private lateinit var scope: ManagedCoroutineScope
+    private lateinit var post: Post
 
-    private var currState = PostDetailViewState()
+    private var currState = PostDetailViewState(
+        subReddit = "",
+        postShortName = ""
+    )
     private val internalViewState = MutableStateFlow(currState)
 
     val viewState = internalViewState.asStateFlow()
     val actions = MutableStateFlow<PostDetailAction>(InitAction)
 
-
     fun init(scope: ManagedCoroutineScope, post: Post) {
         this.scope = scope
-        actions.onEach { doAction(it) }.launchIn(scope)
+        this.post = post
+        actions.onEach {
+            log.d("doAction: $it")
+            when (it) {
+                InitAction -> doInitAction()
+                ReLoadPostAndComments -> doReloadPostsAndComments()
+            }
+        }.launchIn(this.scope)
+    }
 
-        if (post.subreddit == null || post.postFullName?.asShortName() == null) {
-            scope.launch {
-                currState = currState.copy(showLoadingError = true)
-                internalViewState.emit(currState)
-            }
+    private fun doInitAction() {
+        if (post.subreddit != null && post.postFullName?.asShortName() != null) {
+            currState = currState.copy(
+                post = post,
+                subReddit = post.subreddit!!,
+                postShortName = post.postFullName?.asShortName()!!
+            )
+            doLoadPostsAndComments()
         } else {
-            scope.launch {
-                currState = currState.copy(
-                    post = post,
-                    subReddit = post.subreddit,
-                    postShortName = post.postFullName.asShortName()
-                )
-                internalViewState.emit(currState)
-            }
+            currState = currState.copy(showLoadingError = true)
+            scope.launch { internalViewState.emit(currState) }
         }
     }
 
-    private fun doAction(action: PostDetailAction) {
-        when (action) {
-            InitAction -> {
-                // do nothing
-            }
-            is LoadPostAndComments -> {
-                if (currState.subReddit.isEmpty() || currState.postShortName.isEmpty()) return
-                scope.launch {
-                    currState = currState.copy(isLoadingComments = true)
+    private fun doReloadPostsAndComments() {
+        if (currState.subReddit.isEmpty() || currState.postShortName.isEmpty()) {
+            scope.launch { internalViewState.emit(currState) }
+        } else {
+            doLoadPostsAndComments()
+        }
+    }
+
+    private fun doLoadPostsAndComments() {
+        scope.launch {
+            currState = currState.copy(isLoadingComments = true)
+            internalViewState.emit(currState)
+            val result =
+                postRepository.getPostDetail(currState.subReddit, currState.postShortName)
+            if (result?.post != null) {
+                scope.launch(ioDispatcher) {
+                    val flatComments = result.comments?.flatten()
+                    currState = currState.copy(
+                        isLoadingComments = false,
+                        showLoadingError = false,
+                        post = result.post,
+                        comments = flatComments
+                    )
                     internalViewState.emit(currState)
-                    val result =
-                        postRepository.getPostDetail(currState.subReddit, currState.postShortName)
-                    if (result?.post != null) {
-                        scope.launch(ioDispatcher) {
-                            val flatComments = result.comments?.flatten()
-                            currState = currState.copy(
-                                isLoadingComments = false,
-                                showLoadingError = false,
-                                post = result.post,
-                                comments = flatComments
-                            )
-                            internalViewState.emit(currState)
-                        }
-                    } else {
-                        currState = currState.copy(isLoadingComments = false, showLoadingError = true)
-                        internalViewState.emit(currState)
-                    }
                 }
+            } else {
+                currState = currState.copy(isLoadingComments = false, showLoadingError = true)
+                internalViewState.emit(currState)
             }
         }
     }
@@ -90,17 +100,17 @@ data class PostDetailViewState(
     val isLoadingComments: Boolean = false,
     val showLoadingError: Boolean = false,
 
-    val subReddit: String = "",
-    val postShortName: String = "",
+    val subReddit: String,
+    val postShortName: String,
 
     val post: Post? = null,
     val comments: List<CommentViewData>? = null
-)
+) : ViewState()
 
 
-sealed class PostDetailAction {
+sealed class PostDetailAction : ViewState() {
     object InitAction : PostDetailAction()
-    object LoadPostAndComments : PostDetailAction()
+    object ReLoadPostAndComments : PostDetailAction()
 }
 
 internal fun List<Comment>?.flatten(): List<CommentViewData> {

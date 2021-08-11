@@ -16,24 +16,14 @@ class PostDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         var data = intent.extras
         if (savedInstanceState != null) {
             data = savedInstanceState
         }
-
-//        val subReddit: String = data?.getString(EXTRA_SUBREDDIT)
-//            ?: throw IllegalStateException("Subreddit cannot be null")
-//
-//        val postShortName: String = data.getString(EXTRA_POST_SHORT_NAME)
-//            ?: throw IllegalStateException("Subreddit cannot be null")
-
-        val post: Post = data?.getParcelable<Post>(EXTRA_POST)
+        val post: Post = data?.getParcelable(EXTRA_POST)
             ?: throw IllegalStateException("Post cannot be null")
-
         setContentView(PostDetailView(this, post))
     }
-
 
     companion object {
         private const val EXTRA_POST = "extra_post"
@@ -42,18 +32,5 @@ class PostDetailActivity : AppCompatActivity() {
                 putExtra(EXTRA_POST, post)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    CupOfCoffeeTheme {
-        Greeting("Android")
     }
 }

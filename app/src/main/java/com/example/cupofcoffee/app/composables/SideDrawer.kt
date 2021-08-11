@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.DrawerValue.Closed
 import androidx.compose.material.DrawerValue.Open
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
@@ -26,6 +25,7 @@ import com.example.cupofcoffee.R.string.*
 import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.data.models.defaultSubNames
 import kotlinx.coroutines.launch
+import toSubRedditName
 
 
 @Composable
@@ -86,7 +86,7 @@ fun SideDrawer(
                             textAlign = TextAlign.Center,
                             color = if (subReddit.name == selectedSubReddit.name)
                                 colors.primary else colors.secondary,
-                            text = "r/${subReddit.name}",
+                            text = subReddit.name.toSubRedditName(),
                         )
                         Row(modifier = Modifier.weight(0.1f)) {
                             if (!defaultSubNames.contains(subReddit.name)) {

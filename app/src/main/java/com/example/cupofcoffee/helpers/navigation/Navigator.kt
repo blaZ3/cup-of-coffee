@@ -8,9 +8,7 @@ interface Navigator {
     fun navigateToPostDetail(post: Post)
 }
 
-
 class AppNavigator(private val activity: AppCompatActivity) : Navigator {
-
     override fun navigateToPostDetail(post: Post) {
         activity.startActivity(
             PostDetailActivity.getIntent(
@@ -19,5 +17,4 @@ class AppNavigator(private val activity: AppCompatActivity) : Navigator {
             )
         )
     }
-
 }

@@ -8,11 +8,13 @@ fun String.asShortName(): String {
 }
 
 
-/**
- * This extension cleans up a user inputted sub reddit name
- */
-fun String.toSubRedditName(): String {
+fun String.cleanSubRedditName(): String {
     return run {
         if (startsWith("r/")) substring(indexOf("r/") + 2, length) else this
     }
+}
+
+fun String.toSubRedditName(): String {
+    if (this.contains("/r")) return this
+    return "r/$this"
 }

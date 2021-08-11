@@ -3,7 +3,7 @@ package com.example.cupofcoffee.app.data.models
 import asShortName
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import toSubRedditName
+import cleanSubRedditName
 
 class ExtensionsTests {
 
@@ -17,8 +17,8 @@ class ExtensionsTests {
 
     @Test
     fun `test that sanitized sub reddit names work`(){
-        assertThat("r/news".toSubRedditName()).isEqualTo("news")
-        assertThat("random".toSubRedditName()).isEqualTo("random")
+        assertThat("r/news".cleanSubRedditName()).isEqualTo("news")
+        assertThat("random".cleanSubRedditName()).isEqualTo("random")
     }
 
 }

@@ -9,7 +9,7 @@ import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import kotlinx.coroutines.flow.*
-import toSubRedditName
+import cleanSubRedditName
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
@@ -61,7 +61,7 @@ internal class HomeModel @Inject constructor(
 
     private fun doAddSubReddit(name: String) {
         scope.launch {
-            val subReddit = SubReddit(name.toSubRedditName())
+            val subReddit = SubReddit(name.cleanSubRedditName())
             val newList = currState.subReddits
                 .toMutableList()
                 .also { it.add(subReddit) }

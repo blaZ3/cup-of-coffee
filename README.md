@@ -1,5 +1,5 @@
 # Cup Of Coffee
-![Build status:](https://github.com/blaZ3/cup-of-coffee/actions/workflows/android.yml/badge.svg)  
+[![Android CI](https://github.com/blaZ3/cup-of-coffee/actions/workflows/android.yml/badge.svg)](https://github.com/blaZ3/cup-of-coffee/actions/workflows/android.yml)
 ### Simple reddit client
 
 This s a very simple reddit client built using Jetpack Compose for UI using an MVI pattern 

@@ -32,7 +32,11 @@ internal class PostDetailModel @Inject constructor(
     val viewState = internalViewState.asStateFlow()
     val actions = MutableStateFlow<PostDetailAction>(InitAction)
 
-    fun init(scope: ManagedCoroutineScope, post: Post?, savedViewState: PostDetailViewState?) {
+    fun init(
+        scope: ManagedCoroutineScope,
+        post: Post?,
+        savedViewState: PostDetailViewState? = null
+    ) {
         if (post == null && savedViewState == null) throw IllegalStateException(
             "Both post and savedViewState cannot be null"
         )
@@ -60,7 +64,7 @@ internal class PostDetailModel @Inject constructor(
         }
 
         if (
-            currState.post?.subreddit.isNullOrEmpty() &&
+            currState.post?.subreddit.isNullOrEmpty() ||
             currState.post?.postFullName?.asShortName().isNullOrEmpty()
         ) {
             scope.launch {

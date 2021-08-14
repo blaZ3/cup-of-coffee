@@ -63,6 +63,7 @@ class PostDetailModelTests {
         val post = Post(
             title = "Post title",
             permalink = "xyz",
+            subreddit = null,
             postFullName = "t3_sdfjghdk"
         )
 
@@ -90,6 +91,7 @@ class PostDetailModelTests {
             title = "Post title",
             permalink = "xyz",
             subreddit = "subreddit",
+            postFullName = null
         )
 
         val actions = mutableListOf<PostDetailAction>()

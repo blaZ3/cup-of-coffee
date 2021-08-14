@@ -5,14 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 
 private const val EXTRA_VIEW_STATE = "extra_view_state"
 
-abstract class BaseActivity<T : ViewState> : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
-    protected lateinit var view: BaseView<T>
-    protected var viewState: T? = null
+    protected lateinit var view: BaseView<ViewState>
+    protected var viewState: ViewState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewState = savedInstanceState?.get(EXTRA_VIEW_STATE) as T?
+        viewState = savedInstanceState?.get(EXTRA_VIEW_STATE) as ViewState?
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

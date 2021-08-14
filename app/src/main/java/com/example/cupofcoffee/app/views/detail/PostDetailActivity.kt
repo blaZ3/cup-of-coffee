@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.base.BaseActivity
+import com.example.cupofcoffee.base.BaseView
+import com.example.cupofcoffee.base.ViewState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class PostDetailActivity : BaseActivity<PostDetailViewState>() {
+class PostDetailActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +20,7 @@ class PostDetailActivity : BaseActivity<PostDetailViewState>() {
             data = savedInstanceState
         }
         val post: Post? = data?.getParcelable(EXTRA_POST)
-        view = PostDetailView(this, post, viewState).also {
+        view = (PostDetailView(this, post, viewState) as BaseView<ViewState>).also {
             setContentView(it)
         }
     }

@@ -25,7 +25,9 @@ import com.example.cupofcoffee.app.composables.PostDetail
 import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.ReLoadPostAndComments
+import com.example.cupofcoffee.base.BaseActivity
 import com.example.cupofcoffee.base.BaseView
+import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.ui.theme.CupOfCoffeeTheme
@@ -42,7 +44,7 @@ import toSubRedditName
 class PostDetailView(
     context: Context,
     private val post: Post?,
-    private val savedViewState: PostDetailViewState?
+    private val savedViewState: ViewState?
 ) : BaseView<PostDetailViewState>(context) {
 
     private lateinit var log: Log
@@ -60,7 +62,7 @@ class PostDetailView(
         model.init(
             LifecycleManagedCoroutineScope(lifecycleOwner.lifecycleScope),
             post,
-            savedViewState
+            savedViewState as PostDetailViewState?
         )
     }
 
@@ -74,7 +76,7 @@ class PostDetailView(
                     model.actions.emit(ReLoadPostAndComments)
                 }
             },
-            onBack = { (context as PostDetailActivity).finish() }
+            onBack = { (context as BaseActivity).finish() }
         )
     }
 

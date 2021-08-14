@@ -33,6 +33,7 @@ import com.example.cupofcoffee.app.data.models.PreviewImage
 import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.views.home.HomeAction.*
 import com.example.cupofcoffee.base.BaseView
+import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.helpers.navigation.Navigator
@@ -49,7 +50,7 @@ import kotlinx.coroutines.launch
 class HomeView(
     context: Context,
     private val navigator: Navigator,
-    private val savedViewState: HomeViewState?
+    private val savedViewState: ViewState?
 ) : BaseView<HomeViewState>(context) {
 
     private lateinit var model: HomeModel
@@ -68,7 +69,7 @@ class HomeView(
             scope = it
             model.init(
                 LifecycleManagedCoroutineScope(scope),
-                savedViewState
+                savedViewState as HomeViewState?
             )
         }
     }

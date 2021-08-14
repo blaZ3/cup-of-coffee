@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 
 abstract class BaseView<T : ViewState>(context: Context) : AbstractComposeView(context) {
-
     protected lateinit var lifecycleOwner: LifecycleOwner
 
     override fun onViewAdded(child: View?) {

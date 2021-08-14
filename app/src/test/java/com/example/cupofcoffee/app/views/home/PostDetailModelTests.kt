@@ -29,7 +29,7 @@ class PostDetailModelTests {
     private val log = mock<Log>()
     private val postRepository = PostRepository(RedditService(api = api), log = log)
 
-    private val model = PostDetailModel(postRepository, TestCoroutineDispatcher(), log)
+    private val model = PostDetailModel(postRepository, TestCoroutineDispatcher())
 
     private val postResult = ApiResult(
         resultType = ResultType.Listing,

@@ -79,6 +79,7 @@ data class Post(
 }
 
 
+@Parcelize
 @JsonSerializable
 data class Comment(
     @Json(name = "total_awards_received")
@@ -108,7 +109,7 @@ data class Comment(
     @Json(name = "created_utc")
     val createdUTC: Double = 0.0,
     val subreddit: String? = null,
-) {
+) : Parcelable{
     @IgnoredOnParcel
     val replies: List<Comment>?
         get() = repliesResult?.data?.children?.mapNotNull {

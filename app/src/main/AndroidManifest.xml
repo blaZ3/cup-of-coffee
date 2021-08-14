@@ -17,9 +17,7 @@
         tools:ignore="UnusedAttribute">
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,9 +27,7 @@
             android:name=".app.views.detail.PostDetailActivity"
             android:exported="true"
             android:label="@string/title_activity_post_detail"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.CupOfCoffee.NoActionBar"
-            tools:ignore="LockedOrientationActivity" />
+            android:theme="@style/Theme.CupOfCoffee.NoActionBar" />
     </application>
 
 </manifest>

@@ -13,12 +13,9 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.cupofcoffee.Error.NetworkError
 import com.example.cupofcoffee.R.drawable.ic_back
@@ -28,6 +25,9 @@ import com.example.cupofcoffee.app.composables.PostDetail
 import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.models.DataChild.CommentData
 import com.example.cupofcoffee.app.views.detail.PostDetailAction.ReLoadPostAndComments
+import com.example.cupofcoffee.base.BaseActivity
+import com.example.cupofcoffee.base.BaseView
+import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.ui.theme.CupOfCoffeeTheme
@@ -43,11 +43,11 @@ import toSubRedditName
 @SuppressLint("ViewConstructor")
 class PostDetailView(
     context: Context,
-    private val post: Post
-) : AbstractComposeView(context) {
+    private val post: Post?,
+    private val savedViewState: ViewState?
+) : BaseView<PostDetailViewState>(context) {
 
     private lateinit var log: Log
-    private lateinit var scope: LifecycleCoroutineScope
     private lateinit var model: PostDetailModel
 
     override fun onViewAdded(child: View?) {
@@ -58,13 +58,12 @@ class PostDetailView(
         )
         log = entryPoint.log()
         model = entryPoint.postDetailModel()
-        findViewTreeLifecycleOwner()?.lifecycleScope?.let {
-            scope = it
-            model.init(LifecycleManagedCoroutineScope(scope), post)
-        }
-//        scope.launch {
-//            model.actions.emit(ReLoadPostAndComments)
-//        }
+
+        model.init(
+            LifecycleManagedCoroutineScope(lifecycleOwner.lifecycleScope),
+            post,
+            savedViewState as PostDetailViewState?
+        )
     }
 
     @Composable
@@ -73,14 +72,17 @@ class PostDetailView(
             viewState = model.viewState,
             log = log,
             onReload = {
-                scope.launch {
+                lifecycleOwner.lifecycleScope.launch {
                     model.actions.emit(ReLoadPostAndComments)
                 }
             },
-            onBack = { (context as PostDetailActivity).finish() }
+            onBack = { (context as BaseActivity).finish() }
         )
     }
 
+    override fun getCurrentViewState(): PostDetailViewState {
+        return model.viewState.value
+    }
 
     @EntryPoint
     @InstallIn(ActivityComponent::class)
@@ -102,7 +104,7 @@ internal fun PostDetailScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             viewState.collectAsState().value.let { state ->
                 log?.d("PostDetailScreen new state: $state")
-                TopAppBar(title = { Text(text = state.subReddit.toSubRedditName()) },
+                TopAppBar(title = { Text(text = state.subReddit?.toSubRedditName().toString()) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(
@@ -164,7 +166,6 @@ fun PostDetailScreenPreview() {
                     )
                 )
             }.flatten(),
-            subReddit = "",
             postShortName = ""
         )
     )

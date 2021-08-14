@@ -3,16 +3,15 @@ package com.example.cupofcoffee.app.views.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.cupofcoffee.app.data.models.Post
-import com.example.cupofcoffee.app.views.home.ui.theme.CupOfCoffeeTheme
+import com.example.cupofcoffee.base.BaseActivity
+import com.example.cupofcoffee.base.BaseView
+import com.example.cupofcoffee.base.ViewState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class PostDetailActivity : AppCompatActivity() {
+class PostDetailActivity : BaseActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,9 +19,10 @@ class PostDetailActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             data = savedInstanceState
         }
-        val post: Post = data?.getParcelable(EXTRA_POST)
-            ?: throw IllegalStateException("Post cannot be null")
-        setContentView(PostDetailView(this, post))
+        val post: Post? = data?.getParcelable(EXTRA_POST)
+        view = (PostDetailView(this, post, viewState) as BaseView<ViewState>).also {
+            setContentView(it)
+        }
     }
 
     companion object {

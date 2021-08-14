@@ -1,5 +1,6 @@
 package com.example.cupofcoffee.app.views.home
 
+import cleanSubRedditName
 import com.example.cupofcoffee.app.data.models.*
 import com.example.cupofcoffee.app.data.repository.PostRepository
 import com.example.cupofcoffee.app.data.repository.UserSettingsRepository
@@ -9,7 +10,7 @@ import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import kotlinx.coroutines.flow.*
-import cleanSubRedditName
+import kotlinx.parcelize.Parcelize
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
@@ -27,13 +28,15 @@ internal class HomeModel @Inject constructor(
     val viewState = internalViewState.asStateFlow()
     val actions = MutableStateFlow<HomeAction>(InitAction)
 
-    fun init(lifecycleCoroutineScope: ManagedCoroutineScope) {
+    fun init(
+        lifecycleCoroutineScope: ManagedCoroutineScope,
+        savedViewState: HomeViewState? = null
+    ) {
         this.scope = lifecycleCoroutineScope
         actions.onEach {
             log.d("doAction: $it")
             when (it) {
-                InitAction,
-                UserSettingsChanged -> doInitAction()
+                InitAction -> doInitAction(savedViewState)
                 is Reload -> doReload()
                 is LoadMore -> doLoadMore()
                 is SelectedSubRedditChanged -> doChangeSelectedSubReddit(it.subReddit)
@@ -115,7 +118,14 @@ internal class HomeModel @Inject constructor(
         }
     }
 
-    private fun doInitAction() {
+    private fun doInitAction(savedViewState: HomeViewState?) {
+        savedViewState?.let {
+            scope.launch {
+                currState = it
+                internalViewState.emit(currState)
+            }
+            return
+        }
         scope.launch {
             scope.launch {
                 userSettingsRepository.getUserSelectedSubReddit()
@@ -182,7 +192,7 @@ internal class HomeModel @Inject constructor(
     }
 }
 
-
+@Parcelize
 data class HomeViewState(
     val selectedSubreddit: SubReddit = DEFAULT_SUB_REDDIT,
     val subReddits: List<SubReddit> = listOf(),
@@ -198,7 +208,6 @@ data class HomeViewState(
 
 sealed class HomeAction : Action() {
     object InitAction : HomeAction()
-    object UserSettingsChanged : HomeAction()
     data class Reload(val timestamp: Long = currentTimeMillis()) : HomeAction()
     data class LoadMore(val timestamp: Long = currentTimeMillis()) : HomeAction()
 

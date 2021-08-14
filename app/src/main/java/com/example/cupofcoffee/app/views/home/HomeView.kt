@@ -15,7 +15,6 @@ import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +32,8 @@ import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.models.PreviewImage
 import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.views.home.HomeAction.*
+import com.example.cupofcoffee.base.BaseView
+import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.helpers.navigation.Navigator
@@ -48,8 +49,9 @@ import kotlinx.coroutines.launch
 @SuppressLint("ViewConstructor")
 class HomeView(
     context: Context,
-    private val navigator: Navigator
-) : AbstractComposeView(context) {
+    private val navigator: Navigator,
+    private val savedViewState: ViewState?
+) : BaseView<HomeViewState>(context) {
 
     private lateinit var model: HomeModel
     private lateinit var log: Log
@@ -65,14 +67,22 @@ class HomeView(
         model = entryPoint.homeDetail()
         findViewTreeLifecycleOwner()?.lifecycleScope?.let {
             scope = it
-            model.init(LifecycleManagedCoroutineScope(scope))
+            model.init(
+                LifecycleManagedCoroutineScope(scope),
+                savedViewState as HomeViewState?
+            )
         }
+    }
+
+    override fun getCurrentViewState(): HomeViewState {
+        return model.viewState.value
     }
 
     @Composable
     override fun Content() {
         CupOfCoffeeTheme {
-            HomeScreen(model.viewState, log,
+            HomeScreen(
+                model.viewState, log,
                 onReloadPosts = { scope.launch { model.actions.emit(Reload()) } },
                 onPageEndReached = { scope.launch { model.actions.emit(LoadMore()) } },
                 onPostClicked = { navigator.navigateToPostDetail(it) },

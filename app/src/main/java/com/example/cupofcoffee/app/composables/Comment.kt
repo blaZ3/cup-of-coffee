@@ -1,5 +1,6 @@
 package com.example.cupofcoffee.app.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -14,16 +15,19 @@ import com.example.cupofcoffee.app.views.detail.CommentViewData
 @Composable
 fun Comment(commentViewData: CommentViewData) {
     Column(
-        modifier = Modifier.padding(
-            start = 8.dp * commentViewData.nesting,
-            top = 4.dp
-        )
+        modifier = Modifier
+            .padding(
+                start = 8.dp * commentViewData.nesting,
+                top = 4.dp
+            )
+            .background(MaterialTheme.colors.surface)
     ) {
         commentViewData.comment.author?.let {
             Text(
                 modifier = Modifier.padding(4.dp),
                 text = "u/${commentViewData.comment.author}",
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onSurface,
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -33,7 +37,8 @@ fun Comment(commentViewData: CommentViewData) {
                     .padding(4.dp)
                     .semantics { testTag = "comment-body" },
                 text = commentViewData.comment.body,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface,
             )
         }
         Divider()
@@ -43,7 +48,8 @@ fun Comment(commentViewData: CommentViewData) {
                 .fillMaxWidth()
                 .semantics { testTag = "comment-score" },
             text = "${commentViewData.comment.score} Score",
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.onSurface,
         )
         Divider()
     }

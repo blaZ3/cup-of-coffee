@@ -35,7 +35,8 @@ fun Loading(msg: String? = null) {
         )
         Text(
             text = msg ?: "Loading",
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface
         )
     }
 }

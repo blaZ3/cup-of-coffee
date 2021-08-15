@@ -124,35 +124,36 @@ internal class HomeModel @Inject constructor(
                 currState = it
                 internalViewState.emit(currState)
             }
-            return
         }
+        listenForSelectedSubChange()
+        listenForUserSubsList()
+    }
+
+    private fun listenForSelectedSubChange() {
         scope.launch {
-            scope.launch {
-                userSettingsRepository.getUserSelectedSubReddit()
-                    .collect {
-                        currState = currState.copy(
-                            selectedSubreddit = it,
-                            after = null,
-                            isLoading = true
-                        )
-                        currState = currState.copy(
-                            isLoading = true,
-                            showLoadingError = false,
-                            showEmptyPosts = false,
-                            isPaginating = false
-                        )
-                        internalViewState.emit(currState)
-                        loadPosts(reset = true)
-                    }
-            }
-
-            scope.launch {
-                userSettingsRepository.getUserSubReddits().collect {
-                    currState = currState.copy(subReddits = it)
+            userSettingsRepository.getUserSelectedSubReddit()
+                .filter { currState.selectedSubreddit != it }
+                .collect {
+                    currState = currState.copy(
+                        after = null,
+                        selectedSubreddit = it,
+                        isLoading = true,
+                        showLoadingError = false,
+                        showEmptyPosts = false,
+                        isPaginating = false
+                    )
                     internalViewState.emit(currState)
+                    loadPosts(reset = true)
                 }
-            }
+        }
+    }
 
+    private fun listenForUserSubsList() {
+        scope.launch {
+            userSettingsRepository.getUserSubReddits().collect {
+                currState = currState.copy(subReddits = it)
+                internalViewState.emit(currState)
+            }
         }
     }
 

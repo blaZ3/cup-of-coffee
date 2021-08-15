@@ -21,16 +21,20 @@ fun NetworkError(onReload: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.network_error),
-            style = MaterialTheme.typography.h5
+            style = MaterialTheme.typography.h5,
+            color = MaterialTheme.colors.onSurface
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(R.string.msg_reload),
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onReload) {
-            Text(text = stringResource(R.string.reload))
+            Text(
+                text = stringResource(R.string.reload)
+            )
         }
     }
 }

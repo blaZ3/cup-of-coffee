@@ -1,6 +1,7 @@
 package com.example.cupofcoffee.app.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -117,68 +118,78 @@ fun PostDetail(
     isLoadingComments: Boolean = false,
     comments: List<CommentViewData>?
 ) {
-    Column {
-        LazyColumn {
-            item(post.postFullName) {
-                Column(modifier = Modifier.padding(4.dp)) {
+    LazyColumn(
+        modifier = Modifier.background(MaterialTheme.colors.surface),
+    ) {
+        item(post.postFullName) {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                Text(
+                    modifier = Modifier.padding(4.dp),
+                    text = post.postedInfo,
+                    style = MaterialTheme.typography.body2,
+                    color = MaterialTheme.colors.onSurface,
+                )
+                post.title?.let {
                     Text(
-                        modifier = Modifier.padding(4.dp),
-                        text = post.postedInfo,
-                        style = MaterialTheme.typography.body2
+                        modifier = Modifier.semantics {
+                            testTag = "post-detail-title"
+                        },
+                        text = post.title,
+                        style = MaterialTheme.typography.h5,
+                        color = MaterialTheme.colors.onSurface,
                     )
-                    post.title?.let {
-                        Text(
-                            modifier = Modifier.semantics {
-                                testTag = "post-detail-title"
-                            },
-                            text = post.title,
-                            style = MaterialTheme.typography.h5
-                        )
-                    }
-                    if (post.isImage && post.cleanedImageUrl != null) {
-                        Image(
-                            painter = rememberCoilPainter(
-                                request = post.cleanedImageUrl
-                            ),
-                            contentDescription = post.title,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp)
-                                .clip(shape = RoundedCornerShape(4.dp)),
-                            contentScale = ContentScale.FillWidth
-                        )
-                    }
-                    Divider()
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(
-                            text = "${post.upVotes} Ups",
-                            style = MaterialTheme.typography.body2
-                        )
-                        Text(
-                            text = "${post.downVotes} Downs",
-                            style = MaterialTheme.typography.body2
-                        )
-                        Text(
-                            text = "${post.numComments} Comments",
-                            style = MaterialTheme.typography.body2
-                        )
-                    }
                 }
-                Divider(modifier = Modifier.height(4.dp))
-                Spacer(modifier = Modifier.height(4.dp))
+                if (post.isImage && post.cleanedImageUrl != null) {
+                    Image(
+                        painter = rememberCoilPainter(
+                            request = post.cleanedImageUrl
+                        ),
+                        contentDescription = post.title,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp)
+                            .clip(shape = RoundedCornerShape(4.dp)),
+                        contentScale = ContentScale.FillWidth
+                    )
+                }
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = "${post.upVotes} Ups",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onSurface,
+                    )
+                    Text(
+                        text = "${post.downVotes} Downs",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onSurface,
+                    )
+                    Text(
+                        text = "${post.numComments} Comments",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onSurface,
+                    )
+                }
             }
-            if (isLoadingComments) {
-                items(1) { Loading(stringResource(R.string.loading_comments)) }
-            } else {
-                comments?.let {
-                    items(comments) { comment ->
-                        Comment(commentViewData = comment)
-                    }
+            Divider(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+        if (isLoadingComments) {
+            items(1) {
+                Loading(stringResource(R.string.loading_comments))
+            }
+        } else {
+            comments?.let {
+                items(comments) { comment ->
+                    Comment(commentViewData = comment)
                 }
             }
         }

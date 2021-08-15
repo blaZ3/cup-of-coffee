@@ -133,6 +133,7 @@ private fun HomeScreen(
         ) {
             TopAppBar(
                 title = { Text(text = stringResource(id = app_name)) },
+                backgroundColor = colors.surface,
                 navigationIcon = {
                     IconButton(onClick = {
                         scope.launch { drawerState.open() }

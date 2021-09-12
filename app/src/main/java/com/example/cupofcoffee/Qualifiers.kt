@@ -15,4 +15,4 @@ annotation class MainDispatcher
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class UserSettingsDS
+annotation class UserSettingsAndroidDS

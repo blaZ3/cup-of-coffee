@@ -3,7 +3,6 @@ package com.example.cupofcoffee.app.views.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,33 +37,29 @@ import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.helpers.navigation.Navigator
 import com.example.cupofcoffee.ui.theme.CupOfCoffeeTheme
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors.fromActivity
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @SuppressLint("ViewConstructor")
+@AndroidEntryPoint
 class HomeView(
     context: Context,
     private val navigator: Navigator,
     private val savedViewState: ViewState?
 ) : BaseView<HomeViewState>(context) {
 
-    private lateinit var model: HomeModel
-    private lateinit var log: Log
+    @Inject
+    lateinit var model: HomeModel
+
+    @Inject
+    lateinit var log: Log
     private lateinit var scope: LifecycleCoroutineScope
 
     override fun onViewAdded(child: View?) {
         super.onViewAdded(child)
-        val entryPoint = fromActivity(
-            context as AppCompatActivity,
-            HomeViewEntryPoint::class.java
-        )
-        log = entryPoint.log()
-        model = entryPoint.homeDetail()
         findViewTreeLifecycleOwner()?.lifecycleScope?.let {
             scope = it
             model.init(
@@ -93,13 +88,6 @@ class HomeView(
                 onRemoveSubReddit = { scope.launch { model.actions.emit(RemoveSubRedditFromList(it)) } },
             )
         }
-    }
-
-    @EntryPoint
-    @InstallIn(ActivityComponent::class)
-    internal interface HomeViewEntryPoint {
-        fun homeDetail(): HomeModel
-        fun log(): Log
     }
 }
 

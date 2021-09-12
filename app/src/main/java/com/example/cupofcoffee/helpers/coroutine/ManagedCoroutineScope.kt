@@ -5,11 +5,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
-internal interface ManagedCoroutineScope : CoroutineScope {
+interface ManagedCoroutineScope : CoroutineScope {
     fun launch(block: suspend CoroutineScope.() -> Unit): Job
 }
 
-internal class LifecycleManagedCoroutineScope(
+class LifecycleManagedCoroutineScope(
     private val lifecycleCoroutineScope: LifecycleCoroutineScope
 ) : ManagedCoroutineScope {
     override val coroutineContext: CoroutineContext

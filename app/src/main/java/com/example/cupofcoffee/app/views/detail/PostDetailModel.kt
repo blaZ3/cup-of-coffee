@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
-internal class PostDetailModel @Inject constructor(
+class PostDetailModel @Inject constructor(
     private val postRepository: PostRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {

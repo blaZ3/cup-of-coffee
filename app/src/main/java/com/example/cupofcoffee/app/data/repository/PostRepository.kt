@@ -6,8 +6,10 @@ import com.example.cupofcoffee.app.data.models.Post
 import com.example.cupofcoffee.app.data.network.RedditService
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.helpers.network.Result
+import dagger.hilt.android.scopes.ViewScoped
 import javax.inject.Inject
 
+@ViewScoped
 class PostRepository @Inject constructor(
     private val redditService: RedditService,
     private val log: Log

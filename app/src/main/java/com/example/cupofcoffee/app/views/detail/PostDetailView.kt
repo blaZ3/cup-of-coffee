@@ -3,7 +3,6 @@ package com.example.cupofcoffee.app.views.detail
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Icon
@@ -32,34 +31,29 @@ import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.LifecycleManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
 import com.example.cupofcoffee.ui.theme.CupOfCoffeeTheme
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors.fromActivity
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import toSubRedditName
+import javax.inject.Inject
 
 @SuppressLint("ViewConstructor")
+@AndroidEntryPoint
 class PostDetailView(
     context: Context,
     private val post: Post?,
     private val savedViewState: ViewState?
 ) : BaseView<PostDetailViewState>(context) {
 
-    private lateinit var log: Log
-    private lateinit var model: PostDetailModel
+    @Inject
+    lateinit var log: Log
+
+    @Inject
+    lateinit var model: PostDetailModel
 
     override fun onViewAdded(child: View?) {
         super.onViewAdded(child)
-        val entryPoint = fromActivity(
-            context as AppCompatActivity,
-            PostDetailViewEntryPoint::class.java
-        )
-        log = entryPoint.log()
-        model = entryPoint.postDetailModel()
-
         model.init(
             LifecycleManagedCoroutineScope(lifecycleOwner.lifecycleScope),
             post,
@@ -85,13 +79,6 @@ class PostDetailView(
 
     override fun getCurrentViewState(): PostDetailViewState {
         return model.viewState.value
-    }
-
-    @EntryPoint
-    @InstallIn(ActivityComponent::class)
-    internal interface PostDetailViewEntryPoint {
-        fun postDetailModel(): PostDetailModel
-        fun log(): Log
     }
 }
 

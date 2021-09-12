@@ -9,13 +9,15 @@ import com.example.cupofcoffee.base.Action
 import com.example.cupofcoffee.base.ViewState
 import com.example.cupofcoffee.helpers.coroutine.ManagedCoroutineScope
 import com.example.cupofcoffee.helpers.log.Log
+import dagger.hilt.android.scopes.ViewScoped
 import kotlinx.coroutines.flow.*
 import kotlinx.parcelize.Parcelize
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
 
-internal class HomeModel @Inject constructor(
+@ViewScoped
+class HomeModel @Inject constructor(
     private val postRepo: PostRepository,
     private val userSettingsRepository: UserSettingsRepository,
     private val log: Log

@@ -3,14 +3,15 @@ package com.example.cupofcoffee.app.data.repository
 import com.example.cupofcoffee.app.data.models.POPULAR_SUB_REDDIT
 import com.example.cupofcoffee.app.data.models.SubReddit
 import com.example.cupofcoffee.app.data.models.defaultSubs
-import com.example.cupofcoffee.app.data.store.usersettings.AppUserSettingsDataStore
 import com.example.cupofcoffee.app.data.store.usersettings.UserSettingsDataStore
+import dagger.hilt.android.scopes.ViewScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+@ViewScoped
 class UserSettingsRepository @Inject constructor(
     private val userSettingsDataStore: UserSettingsDataStore
 ) {

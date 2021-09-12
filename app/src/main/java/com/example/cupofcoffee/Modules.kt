@@ -16,6 +16,7 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -78,21 +79,21 @@ object HelperModule {
     }
 
     @Provides
-    @UserSettingsDS
+    @UserSettingsAndroidDS
     fun providesUserSettingsDataStore(@ApplicationContext context: Context): DataStore<UserSettings> {
         return context.userSettingsDataStore
     }
 }
 
-
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewComponent::class)
 object DataStoreModule {
     @Provides
-    fun providesUserSettingsDataStore(@UserSettingsDS dataStore: DataStore<UserSettings>): UserSettingsDataStore {
-        return AppUserSettingsDataStore(dataStore)
+    fun provideAppUserSettingsDataStore(
+        @UserSettingsAndroidDS ds: DataStore<UserSettings>
+    ): UserSettingsDataStore {
+        return AppUserSettingsDataStore(ds)
     }
-
 }
 
 @VisibleForTesting
